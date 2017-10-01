@@ -58,6 +58,20 @@ namespace BugTrackerPro.Models
         public string ConfirmPassword { get; set; }
     }
 
+    public class UpdateInformationViewModel
+    {
+        [Required]
+        [Display(Name = "First Name")]
+        public string FirstName { get; set; }
+
+        [Required]
+        [Display(Name = "Last Name")]
+        public string LastName { get; set; }
+
+        [Display(Name = "Profile Picture")]
+        public string ProfilePic { get; set; }
+    }
+
     public class AddPhoneNumberViewModel
     {
         [Required]

@@ -11,6 +11,7 @@ using BugTrackerPro.Models.CodeFirst;
 
 namespace BugTrackerPro.Controllers
 {
+    [Authorize]
     public class TicketsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();

@@ -1,0 +1,24 @@
+﻿@model BugTrackerPro.Models.ProjectUserViewModels
+
+@{
+    ViewBag.Title = "Edit Project Assignments";
+}
+
+<h2>Edit Project Assignments</h2>
+<hr />
+
+@using (Html.BeginForm("EditProjectAssignments", "Projects", FormMethod.Post))
+{
+    <h4>
+        @Html.DisplayFor(model => model.Project.Title)
+        <input type="submit" value="Assign Users" class="btn btn-default pull-right" style="margin-top: -7px" />
+    </h4>
+    <hr />
+    @Html.HiddenFor(model => model.Project.Id)
+    @Html.ListBox("SelectedUsers", Model.Users)
+}
+
+<div style="margin-top: 40px">
+    @Html.ActionLink("Back to Project Index", "Index")
+</div>
+

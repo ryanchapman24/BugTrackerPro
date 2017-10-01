@@ -20,6 +20,7 @@ namespace BugTrackerPro.Models
                 ViewBag.FirstName = user.FirstName;
                 ViewBag.LastName = user.LastName;
                 ViewBag.FullName = user.FullName;
+                ViewBag.ProfilePic = user.ProfilePic;
             }
             base.OnActionExecuted(filterContext);
         }

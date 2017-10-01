@@ -7,6 +7,8 @@ namespace BugTrackerPro.Models.CodeFirst
 {
     public class Project
     {
+        protected internal ApplicationDbContext db = new ApplicationDbContext();
+
         public Project()
         {
             Users = new HashSet<ApplicationUser>();
@@ -22,5 +24,21 @@ namespace BugTrackerPro.Models.CodeFirst
 
         public virtual ICollection<ApplicationUser> Users { get; set; }
         public virtual ICollection<Ticket> Tickets { get; set; }
+
+        public string AuthorFullName
+        {
+            get
+            {
+                var author = db.Users.FirstOrDefault(u => u.Id == AuthorId);
+                if (author != null)
+                {
+                    return author.FullName;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
     }
 }

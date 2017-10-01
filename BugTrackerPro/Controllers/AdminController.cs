@@ -24,39 +24,54 @@ namespace BugTrackerPro.Controllers
 
                 users.Add(eachUser);
             }
-            return View(users.OrderBy(u => u.User.LastName).ToList());
+            return View(users.OrderBy(u => u.User.FirstName).ToList());
         }
 
         //GET: EditUserRoles
         public ActionResult EditUserRoles(string id)
         {
             var user = db.Users.Find(id);
-            AdminUserViewModels AdminModel = new AdminUserViewModels();
-            UserRolesHelper helper = new UserRolesHelper();
-            var selected = helper.ListUserRoles(id);
-            AdminModel.Roles = new MultiSelectList(db.Roles, "Name", "Name", selected);
-            AdminModel.User = user;
+            var helper = new UserRolesHelper();
+            var model = new AdminUserViewModels();
+            model.User = user;
+            model.SelectedRoles = helper.ListUserRoles(id).ToArray();
+            model.Roles = new MultiSelectList(db.Roles, "Name", "Name", model.SelectedRoles);
 
-            return View(AdminModel);
+            return View(model);
         }
 
         //POST: EditUserRoles
         [HttpPost]
         public ActionResult EditUserRoles(AdminUserViewModels model)
         {
-            var user = model.User;
+            var user = db.Users.Find(model.User.Id);
             UserRolesHelper helper = new UserRolesHelper();
-            foreach (var rolermv in db.Roles.Select(r => r.Id).ToList())
+
+            foreach (var role in db.Roles.Select(r => r.Name).ToList())
             {
-                helper.RemoveUserFromRole(user.Id, rolermv);
+                helper.RemoveUserFromRole(user.Id, role);
             }
 
-            foreach (var roleadd in db.Roles.Select(r => r.Id).ToList())
+            if (model.SelectedRoles != null)
             {
-                helper.AddUserToRole(user.Id, roleadd);
+                foreach (var role in model.SelectedRoles)
+                {
+                    helper.AddUserToRole(user.Id, role);
+                }
+
+                return RedirectToAction("Index");
             }
 
             return RedirectToAction("Index");
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

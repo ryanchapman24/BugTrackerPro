@@ -1,22 +1,84 @@
 ﻿@using Microsoft.AspNet.Identity
+@using BugTrackerPro.Models;
+
 @if (Request.IsAuthenticated)
 {
-    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+    <div class="user-account-btn dropdown">
+        <a href="#" title="My Account" class="user-profile clearfix" data-toggle="dropdown">
+            <img src="../..@ViewBag.ProfilePic" alt="Profile image" style="background-color: white; width: 35px; margin-right: 15px">
+            <span style="margin-top: 5px">@ViewBag.FullName</span>
+            <i style="margin-top: 5px" class="glyph-icon icon-angle-down"></i>
+        </a>
+        <div class="dropdown-menu float-left">
+            <div class="box-sm">
+                <div class="login-box clearfix">
+                    <div class="user-img">
+                        <a href="#" title="" class="change-img">Change photo</a>
+                        <img src="../..@ViewBag.ProfilePic" alt="">
+                    </div>
+                    <div class="user-info">
+                        <span>
+                            @ViewBag.FullName
+                            @*<i>UX/UI developer</i>*@
+                        </span>
+                        <a href="@Url.Action("Index","Manage")" title="Account Settings">Account Settings</a>
+                        <a href="#" title="Profile">Profile</a>
+                    </div>
+                </div>
+                @*<div class="divider"></div>
+                <ul class="reset-ul mrg5B">
+                    <li>
+                        <a href="#">
+                            <i class="glyph-icon float-right icon-caret-right"></i>
+                            View login page example
+
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="glyph-icon float-right icon-caret-right"></i>
+                            View lockscreen example
+
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="glyph-icon float-right icon-caret-right"></i>
+                            View account details
+
+                        </a>
+                    </li>
+                </ul>*@
+                <div class="pad5A button-pane button-pane-alt text-center">
+                    <a href="javascript:document.getElementById('logoutForm').submit()" class="btn display-block font-normal btn-danger">
+                        <i class="glyph-icon icon-power-off"></i>
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" }))
     {
     @Html.AntiForgeryToken()
-
-    <ul class="nav navbar-nav navbar-right">
-        <li>
-            @Html.ActionLink("Hello " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })
-        </li>
-        <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
-    </ul>
     }
 }
 else
 {
-    <ul class="nav navbar-nav navbar-right">
-        <li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
-        <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
-    </ul>
+    <div class="user-account-btn dropdown">
+        <a href="#" title="My Account" class="user-profile clearfix" data-toggle="dropdown">
+            <span>Not Logged In</span>
+            <i class="glyph-icon icon-angle-down"></i>
+        </a>
+        <div class="dropdown-menu float-left">
+            <div class="box-sm">
+                <div class="pad5A button-pane button-pane-alt text-center">
+                    <a href="@Url.Action("Login","Account")" class="btn display-block font-normal btn-danger">
+                        <i class="glyph-icon icon-typicons-power"></i>
+                        Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 }

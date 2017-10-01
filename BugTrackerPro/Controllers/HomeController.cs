@@ -7,6 +7,7 @@ using System.Web.Mvc;
 
 namespace BugTrackerPro.Controllers
 {
+    [Authorize]
     public class HomeController : Universal
     {
         public ActionResult Index()
@@ -26,6 +27,15 @@ namespace BugTrackerPro.Controllers
             ViewBag.Message = "Your contact page.";
 
             return View();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

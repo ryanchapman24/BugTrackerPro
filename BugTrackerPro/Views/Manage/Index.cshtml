@@ -3,7 +3,7 @@
     ViewBag.Title = "Manage";
 }
 
-<h2>@ViewBag.Title.</h2>
+<h2>@ViewBag.Title</h2>
 
 <p class="text-success">@ViewBag.StatusMessage</p>
 <div>
@@ -21,6 +21,12 @@
             {
                 @Html.ActionLink("Create", "SetPassword")
             }
+            ]
+        </dd>
+        <dt>Information:</dt>
+        <dd>
+            [
+            @Html.ActionLink("Update Information", "UpdateInformation")
             ]
         </dd>
         <dt>External Logins:</dt>
