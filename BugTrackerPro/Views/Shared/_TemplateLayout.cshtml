@@ -16,7 +16,7 @@
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../../assets/images/icons/apple-touch-icon-114-precomposed.png">
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../../assets/images/icons/apple-touch-icon-72-precomposed.png">
     <link rel="apple-touch-icon-precomposed" href="../../assets/images/icons/apple-touch-icon-57-precomposed.png">
-    <link rel="shortcut icon" href="../../assets/images/icons/favicon.png">
+    <link rel="shortcut icon" href="../../assets/images/icons/E.ico">
 
     <link rel="stylesheet" type="text/css" href="../../assets/bootstrap/css/bootstrap.css">
 
@@ -129,10 +129,12 @@
     <script type="text/javascript" src="../../assets/js-core/jquery-ui-widget.js"></script>
     <script type="text/javascript" src="../../assets/js-core/jquery-ui-mouse.js"></script>
     <script type="text/javascript" src="../../assets/js-core/jquery-ui-position.js"></script>
-    <!--<script type="text/javascript" src="../../assets/js-core/transition.js"></script>-->
+    <script type="text/javascript" src="../../assets/js-core/transition.js"></script>
     <script type="text/javascript" src="../../assets/js-core/modernizr.js"></script>
     <script type="text/javascript" src="../../assets/js-core/jquery-cookie.js"></script>
-
+    <!-- Nice Scroll -->
+    <script src="~/assets/widgets/nicescroll/nicescroll.js"></script>
+    <script src="~/assets/widgets/nicescroll/nicescroll-demo.js"></script>
 
     <script type="text/javascript">
         $(window).load(function(){
@@ -141,12 +143,11 @@
             }, 300);
         });
     </script>
-
 </head>
 
-<body class="fixed-sidebar fixed-header">
+<body class="fixed-header scrollable-content scrollable-nice">
     <div id="sb-site">
-        <div class="sb-slidebar bg-black sb-left sb-style-overlay">
+        @*<div class="sb-slidebar bg-black sb-left sb-style-overlay">
             <div class="scrollable-content scrollable-slim-sidebar">
                 <div class="pad10A">
                     <div class="divider-header">Online</div>
@@ -270,8 +271,8 @@
                     </ul>
                 </div>
             </div>
-        </div>
-        <div class="sb-slidebar bg-black sb-right sb-style-overlay">
+        </div>*@
+        <div class="sb-slidebar bg-black sb-left sb-style-overlay">
             <div class="scrollable-content scrollable-slim-sidebar">
                 <div class="pad15A">
                     <a href="#" title="" data-toggle="collapse" data-target="#sidebar-toggle-1" class="popover-title">
@@ -490,14 +491,14 @@
             <div id="page-header" class="bg-red">
                 <div id="mobile-navigation">
                     <button id="nav-toggle" class="collapsed" data-toggle="collapse" data-target="#page-sidebar"><span></span></button>
-                    <a href="index.html" class="logo-content-small" title="MonarchUI"></a>
+                    <a href="index.html" class="logo-content-small" title="ChapTrackerUI"></a>
                 </div>
                 <div id="header-logo" class="logo-bg">
                     <a href="@Url.Action("Index","Home")" class="logo-content-big" title="ChapTrackerUI">
-                        Monarch <i>UI</i>
-                        <span>The perfect solution for user interfaces</span>
+                        @*Monarch <i>UI</i>
+                        <span>The perfect solution for user interfaces</span>*@
                     </a>
-                    <a href="index.html" class="logo-content-small" title="MonarchUI">
+                    <a href="index.html" class="logo-content-small" title="ChapTrackerUI">
                         Monarch <i>UI</i>
                         <span>The perfect solution for user interfaces</span>
                     </a>
@@ -505,11 +506,11 @@
                         <i class="glyph-icon icon-angle-left"></i>
                     </a>
                 </div>
-                <div id="header-nav-left">
+                <div id="header-nav-left">                   
                 @Html.Partial("_LoginPartial")
                 </div><!-- #header-nav-left -->
                 <div id="header-nav-right">
-                    <a href="#" class="hdr-btn popover-button" title="Search" data-placement="bottom" data-id="#popover-search">
+                    @*<a href="#" class="hdr-btn popover-button" title="Search" data-placement="bottom" data-id="#popover-search">
                         <i class="glyph-icon icon-search"></i>
                     </a>
                     <div class="hide" id="popover-search">
@@ -521,13 +522,13 @@
                                 </span>
                             </div>
                         </div>
-                    </div>
+                    </div>*@
                     <a href="#" class="hdr-btn" id="fullscreen-btn" title="Fullscreen">
                         <i class="glyph-icon icon-arrows-alt"></i>
                     </a>
-                    <a href="#" class="hdr-btn sb-toggle-left" id="chatbox-btn" title="Chat sidebar">
+                    @*<a href="#" class="hdr-btn sb-toggle-left" id="chatbox-btn" title="Chat sidebar">
                         <i class="glyph-icon icon-linecons-paper-plane"></i>
-                    </a>
+                    </a>*@
                     <div class="dropdown" id="notifications-btn">
                         <a data-toggle="dropdown" href="#" title="">
                             <span class="small-badge bg-yellow"></span>
@@ -741,92 +742,26 @@
                         </div>
                     </div>
                     <div class="dropdown" id="cloud-btn">
-                        <a href="#" data-placement="bottom" class="tooltip-button sb-toggle-right" title="Statistics Sidebar">
+                        <a href="#" data-placement="bottom" class="tooltip-button sb-toggle-left" title="Statistics Sidebar">
                             <i class="glyph-icon icon-linecons-cloud"></i>
                         </a>
                     </div>
                     <div class="dropdown" id="dashnav-btn">
-                        <a href="#" data-toggle="dropdown" data-placement="bottom" class="popover-button-header tooltip-button" title="Dashboard Quick Menu">
+                        <a href="#" data-toggle="dropdown" data-placement="left" class="popover-button-header tooltip-button" title="My Projects Shortcut">
                             <i class="glyph-icon icon-linecons-cog"></i>
                         </a>
                         <div class="dropdown-menu float-right">
                             <div class="box-sm">
                                 <div class="pad5T pad5B pad10L pad10R dashboard-buttons clearfix">
-                                    <a href="#" class="btn vertical-button hover-blue-alt" title="">
-                                        <span class="glyph-icon icon-separator-vertical pad0A medium">
-                                            <i class="glyph-icon icon-dashboard opacity-80 font-size-20"></i>
-                                        </span>
-                                        Dashboard
-                                    </a>
-                                    <a href="#" class="btn vertical-button hover-green" title="">
-                                        <span class="glyph-icon icon-separator-vertical pad0A medium">
-                                            <i class="glyph-icon icon-tags opacity-80 font-size-20"></i>
-                                        </span>
-                                        Widgets
-                                    </a>
-                                    <a href="#" class="btn vertical-button hover-orange" title="">
-                                        <span class="glyph-icon icon-separator-vertical pad0A medium">
-                                            <i class="glyph-icon icon-fire opacity-80 font-size-20"></i>
-                                        </span>
-                                        Tables
-                                    </a>
-                                    <a href="#" class="btn vertical-button hover-orange" title="">
-                                        <span class="glyph-icon icon-separator-vertical pad0A medium">
-                                            <i class="glyph-icon icon-bar-chart-o opacity-80 font-size-20"></i>
-                                        </span>
-                                        Charts
-                                    </a>
-                                    <a href="#" class="btn vertical-button hover-purple" title="">
-                                        <span class="glyph-icon icon-separator-vertical pad0A medium">
-                                            <i class="glyph-icon icon-laptop opacity-80 font-size-20"></i>
-                                        </span>
-                                        Buttons
-                                    </a>
-                                    <a href="#" class="btn vertical-button hover-azure" title="">
-                                        <span class="glyph-icon icon-separator-vertical pad0A medium">
-                                            <i class="glyph-icon icon-code opacity-80 font-size-20"></i>
-                                        </span>
-                                        Panels
-                                    </a>
-                                </div>
-                                <div class="divider"></div>
-                                <div class="pad5T pad5B pad10L pad10R dashboard-buttons clearfix">
-                                    <a href="#" class="btn vertical-button remove-border btn-info" title="">
-                                        <span class="glyph-icon icon-separator-vertical pad0A medium">
-                                            <i class="glyph-icon icon-dashboard opacity-80 font-size-20"></i>
-                                        </span>
-                                        Dashboard
-                                    </a>
-                                    <a href="#" class="btn vertical-button remove-border btn-danger" title="">
-                                        <span class="glyph-icon icon-separator-vertical pad0A medium">
-                                            <i class="glyph-icon icon-tags opacity-80 font-size-20"></i>
-                                        </span>
-                                        Widgets
-                                    </a>
-                                    <a href="#" class="btn vertical-button remove-border btn-purple" title="">
-                                        <span class="glyph-icon icon-separator-vertical pad0A medium">
-                                            <i class="glyph-icon icon-fire opacity-80 font-size-20"></i>
-                                        </span>
-                                        Tables
-                                    </a>
-                                    <a href="#" class="btn vertical-button remove-border btn-azure" title="">
-                                        <span class="glyph-icon icon-separator-vertical pad0A medium">
-                                            <i class="glyph-icon icon-bar-chart-o opacity-80 font-size-20"></i>
-                                        </span>
-                                        Charts
-                                    </a>
-                                    <a href="#" class="btn vertical-button remove-border btn-yellow" title="">
-                                        <span class="glyph-icon icon-separator-vertical pad0A medium">
-                                            <i class="glyph-icon icon-laptop opacity-80 font-size-20"></i>
-                                        </span>
-                                        Buttons
-                                    </a>
-                                    <a href="#" class="btn vertical-button remove-border btn-warning" title="">
-                                        <span class="glyph-icon icon-separator-vertical pad0A medium">
-                                            <i class="glyph-icon icon-code opacity-80 font-size-20"></i>
-                                        </span>
-                                        Panels
-                                    </a>
+                                    @foreach (var project in ViewBag.MyProjects)
+                                    {
+                                        <a href="@Url.Action("Details", "Projects", new { id = project.Id })" class="btn vertical-button remove-border btn-primary" title="">
+                                            <span class="glyph-icon icon-separator-vertical pad0A medium">
+                                                <i class="glyph-icon icon-cog opacity-80 font-size-20"></i>
+                                            </span>
+                                            @project.Title
+                                        </a>
+                                    }  
                                 </div>
                             </div>
                         </div>
@@ -834,39 +769,42 @@
                     <a class="header-btn" id="logout-btn" href="lockscreen-3.html" title="Lockscreen page example">
                         <i class="glyph-icon icon-linecons-lock"></i>
                     </a>
+                    @if (User.IsInRole("Submitter"))
+                    {
+                        <a class="header-btn btn-primary popover-button-header tooltip-button" id="logout-btn" href="@Url.Action("Create", "Tickets")" data-placement="left" title="Create New Ticket" style="background-color: #00bca4">
+                            <i class="glyph-icon icon-linecons-tag"></i>
+                        </a>
+                    }
                 </div><!-- #header-nav-right -->
             </div>
             <div id="page-sidebar">
                 <div class="scroll-sidebar">
 
                     <ul id="sidebar-menu">
-                        <li class="header"><span>Overview</span></li>
                         @if (User.IsInRole("Admin"))
                         {
+                            <li class="header"><span>Admin</span></li>
                             <li>
                                 <a href="@Url.Action("Index","Admin")" title="Admin Dashboard">
-                                    <i class="glyph-icon icon-linecons-cog"></i>
+                                    <i class="glyph-icon icon-linecons-key"></i>
                                     <span>Admin Dashboard</span>
                                 </a>
                             </li>
                             <li class="divider"></li>
                         }
-                        <li class="no-menu">
-                            <a href="../frontend-template/index.html" title="Frontend template">
-                                <i class="glyph-icon icon-linecons-beaker"></i>
-                                <span>Frontend template</span>
-                                <span class="bs-label label-danger">
-                                    NEW
-                                </span>
+                        <li class="header"><span>My Stuff</span></li>
+                        <li>
+                            <a href="@Url.Action("Index","Home")" title="Projects">
+                                <i class="glyph-icon icon-linecons-fire"></i>
+                                <span>Dashboard</span>
                             </a>
                         </li>
-                        <li class="header"><span>Components</span></li>
                         <li>
-                            <a href="#" title="Elements">
-                                <i class="glyph-icon icon-linecons-diamond"></i>
-                                <span>Elements</span>
+                            <a href="@Url.Action("Index","Projects")" title="Projects">
+                                <i class="glyph-icon icon-linecons-cog"></i>
+                                <span>Projects</span>
                             </a>
-                            <div class="sidebar-submenu">
+                            @*<div class="sidebar-submenu">
                                 <ul>
                                     <li><a href="buttons.html" title="Buttons"><span>Buttons</span></a></li>
                                     <li><a href="labels-badges.html" title="Labels &amp; Badges"><span>Labels &amp; Badges</span></a></li>
@@ -876,9 +814,9 @@
                                     <li><a href="response-messages.html" title="Response messages"><span>Response messages</span></a></li>
                                     <li><a href="images.html" title="Images"><span>Images</span></a></li>
                                 </ul>
-                            </div><!-- .sidebar-submenu -->
+                            </div>*@<!-- .sidebar-submenu -->
                         </li>
-                        <li>
+                        @*<li>
                             <a href="#" title="Dashboard boxes">
                                 <i class="glyph-icon icon-linecons-lightbulb"></i>
                                 <span>Dashboard boxes</span>
@@ -1068,27 +1006,13 @@
                                 </ul>
                             </div><!-- .sidebar-submenu -->
                         </li>
-                    </ul><!-- #sidebar-menu -->
+                    </ul>*@<!-- #sidebar-menu -->
 
                 </div>
             </div>
             <div id="page-content-wrapper">
                 <div id="page-content">
                     <div class="container">
-
-                        <!-- Sparklines charts -->
-                        <script type="text/javascript" src="../../assets/widgets/charts/sparklines/sparklines.js"></script>
-                        <script type="text/javascript" src="../../assets/widgets/charts/sparklines/sparklines-demo.js"></script>
-                        <!-- Flot charts -->
-                        <script type="text/javascript" src="../../assets/widgets/charts/flot/flot.js"></script>
-                        <script type="text/javascript" src="../../assets/widgets/charts/flot/flot-resize.js"></script>
-                        <script type="text/javascript" src="../../assets/widgets/charts/flot/flot-stack.js"></script>
-                        <script type="text/javascript" src="../../assets/widgets/charts/flot/flot-pie.js"></script>
-                        <script type="text/javascript" src="../../assets/widgets/charts/flot/flot-tooltip.js"></script>
-                        <script type="text/javascript" src="../../assets/widgets/charts/flot/flot-demo-1.js"></script>
-                        <!-- PieGage charts -->
-                        <script type="text/javascript" src="../../assets/widgets/charts/piegage/piegage.js"></script>
-                        <script type="text/javascript" src="../../assets/widgets/charts/piegage/piegage-demo.js"></script>
                         
                         @RenderBody()
                         
@@ -1136,6 +1060,13 @@
         <script type="text/javascript" src="../../assets/themes/admin/layout.js"></script>
         <!-- Theme switcher -->
         <script type="text/javascript" src="../../assets/widgets/theme-switcher/themeswitcher.js"></script>
+
+        <!-- Data tables -->
+        <script type="text/javascript" src="../../assets/widgets/datatable/datatable.js"></script>
+        <script type="text/javascript" src="../../assets/widgets/datatable/datatable-bootstrap.js"></script>
+        <script type="text/javascript" src="../../assets/widgets/datatable/datatable-tabletools.js"></script>
+        <script type="text/javascript" src="../../assets/widgets/datatable/datatable-reorder.js"></script>
+
         @RenderSection("scripts", required: false)
     </div>
 </body>

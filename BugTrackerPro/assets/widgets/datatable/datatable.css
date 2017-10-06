@@ -455,6 +455,6 @@ div.DTCR_pointer {
 #datatable-tabletools_length select { height:34px; }
 
 #datatable-fixedcolumns { display:table !important; }
-#ToolTables_datatable-tabletools_4  { display:none; }
+/*#ToolTables_datatable-tabletools_4  { display:none; }*/
 
 .dfc-table .form-inline   { display:block !important; }

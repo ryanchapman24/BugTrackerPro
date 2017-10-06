@@ -21,6 +21,15 @@ namespace BugTrackerPro.Models
                 ViewBag.LastName = user.LastName;
                 ViewBag.FullName = user.FullName;
                 ViewBag.ProfilePic = user.ProfilePic;
+
+                if (User.IsInRole("Admin") || User.IsInRole("Project Manager"))
+                {
+                    ViewBag.MyProjects = db.Projects.OrderBy(p => p.Title).ToList();
+                }
+                else
+                {
+                    ViewBag.MyProjects = user.Projects.OrderBy(p => p.Title).ToList();
+                }
             }
             base.OnActionExecuted(filterContext);
         }

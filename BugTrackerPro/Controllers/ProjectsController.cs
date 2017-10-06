@@ -14,16 +14,13 @@ using Microsoft.AspNet.Identity;
 namespace BugTrackerPro.Controllers
 {
     [Authorize]
-    public class ProjectsController : Controller
+    public class ProjectsController : Universal
     {
-        private ApplicationDbContext db = new ApplicationDbContext();
-
         // GET: Projects
         [Authorize]
         public ActionResult Index()
         {
-            ProjectAssignmentsHelper ph = new ProjectAssignmentsHelper();
-
+            var user = db.Users.Find(User.Identity.GetUserId());
             IList<Project> projects = new List<Project>();
 
             if (User.IsInRole("Admin") || User.IsInRole("Project Manager"))
@@ -32,7 +29,7 @@ namespace BugTrackerPro.Controllers
             }
             else
             {
-                projects = ph.ListUserProjects(User.Identity.GetUserId()).OrderBy(p => p.Title).ToList();
+                projects = user.Projects.OrderBy(p => p.Title).ToList();
             }
 
             return View(projects);
@@ -109,11 +106,12 @@ namespace BugTrackerPro.Controllers
         [Authorize(Roles = "Admin,Project Manager")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,Created,Updated,Title,Description,AuthorId")] Project project)
+        public ActionResult Edit([Bind(Include = "Id,Created,Title,Description,AuthorId")] Project project)
         {
             if (ModelState.IsValid)
             {
                 db.Entry(project).State = EntityState.Modified;
+                project.Updated = DateTime.Now;
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }

@@ -8,14 +8,13 @@ using System.Web;
 using System.Web.Mvc;
 using BugTrackerPro.Models;
 using BugTrackerPro.Models.CodeFirst;
+using Microsoft.AspNet.Identity;
 
 namespace BugTrackerPro.Controllers
 {
     [Authorize]
-    public class TicketsController : Controller
+    public class TicketsController : Universal
     {
-        private ApplicationDbContext db = new ApplicationDbContext();
-
         // GET: Tickets
         public ActionResult Index()
         {
@@ -39,13 +38,21 @@ namespace BugTrackerPro.Controllers
         }
 
         // GET: Tickets/Create
+        [Authorize(Roles = "Submitter")]
         public ActionResult Create()
         {
-            ViewBag.AssignToUserId = new SelectList(db.Users, "Id", "FirstName");
-            ViewBag.OwnerUserId = new SelectList(db.Users, "Id", "FirstName");
-            ViewBag.ProjectId = new SelectList(db.Projects, "Id", "Title");
+            var user = db.Users.Find(User.Identity.GetUserId());
+            List<Project> projects = new List<Project>();
+            if (User.IsInRole("Admin"))
+            {
+                projects = db.Projects.OrderBy(p => p.Title).ToList();
+            }
+            else
+            {
+                projects = user.Projects.OrderBy(p => p.Title).ToList();
+            }
+            ViewBag.ProjectId = new SelectList(projects, "Id", "Title");
             ViewBag.TicketPriorityId = new SelectList(db.TicketPriorities, "Id", "Name");
-            ViewBag.TicketStatusId = new SelectList(db.TicketStatuses, "Id", "Name");
             ViewBag.TicketTypeId = new SelectList(db.TicketTypes, "Id", "Name");
             return View();
         }
@@ -53,22 +60,32 @@ namespace BugTrackerPro.Controllers
         // POST: Tickets/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Submitter")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,Title,Description,Created,Updated,ProjectId,TicketTypeId,TicketPriorityId,TicketStatusId,OwnerUserId,AssignToUserId")] Ticket ticket)
+        public ActionResult Create([Bind(Include = "Id,Title,Description,ProjectId,TicketTypeId,TicketPriorityId")] Ticket ticket)
         {
+            var user = db.Users.Find(User.Identity.GetUserId());
             if (ModelState.IsValid)
             {
+                ticket.Created = DateTime.Now;
+                ticket.TicketStatusId = 1;
+                ticket.OwnerUserId = user.Id;
                 db.Tickets.Add(ticket);
                 db.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Details", "Projects", new { id = ticket.ProjectId });
             }
-
-            ViewBag.AssignToUserId = new SelectList(db.Users, "Id", "FirstName", ticket.AssignToUserId);
-            ViewBag.OwnerUserId = new SelectList(db.Users, "Id", "FirstName", ticket.OwnerUserId);
+            List<Project> projects = new List<Project>();
+            if (User.IsInRole("Admin"))
+            {
+                projects = db.Projects.OrderBy(p => p.Title).ToList();
+            }
+            else
+            {
+                projects = user.Projects.OrderBy(p => p.Title).ToList();
+            }
             ViewBag.ProjectId = new SelectList(db.Projects, "Id", "Title", ticket.ProjectId);
             ViewBag.TicketPriorityId = new SelectList(db.TicketPriorities, "Id", "Name", ticket.TicketPriorityId);
-            ViewBag.TicketStatusId = new SelectList(db.TicketStatuses, "Id", "Name", ticket.TicketStatusId);
             ViewBag.TicketTypeId = new SelectList(db.TicketTypes, "Id", "Name", ticket.TicketTypeId);
             return View(ticket);
         }
@@ -85,8 +102,6 @@ namespace BugTrackerPro.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.AssignToUserId = new SelectList(db.Users, "Id", "FirstName", ticket.AssignToUserId);
-            ViewBag.OwnerUserId = new SelectList(db.Users, "Id", "FirstName", ticket.OwnerUserId);
             ViewBag.ProjectId = new SelectList(db.Projects, "Id", "Title", ticket.ProjectId);
             ViewBag.TicketPriorityId = new SelectList(db.TicketPriorities, "Id", "Name", ticket.TicketPriorityId);
             ViewBag.TicketStatusId = new SelectList(db.TicketStatuses, "Id", "Name", ticket.TicketStatusId);
@@ -107,8 +122,6 @@ namespace BugTrackerPro.Controllers
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            ViewBag.AssignToUserId = new SelectList(db.Users, "Id", "FirstName", ticket.AssignToUserId);
-            ViewBag.OwnerUserId = new SelectList(db.Users, "Id", "FirstName", ticket.OwnerUserId);
             ViewBag.ProjectId = new SelectList(db.Projects, "Id", "Title", ticket.ProjectId);
             ViewBag.TicketPriorityId = new SelectList(db.TicketPriorities, "Id", "Name", ticket.TicketPriorityId);
             ViewBag.TicketStatusId = new SelectList(db.TicketStatuses, "Id", "Name", ticket.TicketStatusId);

@@ -511,9 +511,11 @@
     <Content Include="assets\images\icons\apple-touch-icon-144-precomposed.png" />
     <Content Include="assets\images\icons\apple-touch-icon-57-precomposed.png" />
     <Content Include="assets\images\icons\apple-touch-icon-72-precomposed.png" />
+    <Content Include="assets\images\icons\E.ico" />
     <Content Include="assets\images\icons\favicon.png" />
     <Content Include="assets\images\jcrop.gif" />
     <Content Include="assets\images\login-bg.png" />
+    <Content Include="assets\images\RyanChapman_Evolv3_Logo.png" />
     <Content Include="assets\images\spinner\loader-dark.gif" />
     <Content Include="assets\images\spinner\loader-light.gif" />
     <Content Include="assets\js-core\d3.js" />
@@ -1256,6 +1258,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="ProfilePics\" />
+    <Folder Include="Views\TicketComments\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -4,21 +4,30 @@
     ViewBag.Title = "Edit Project Assignments";
 }
 
-<h2>Edit Project Assignments</h2>
-<hr />
-
 @using (Html.BeginForm("EditProjectAssignments", "Projects", FormMethod.Post))
 {
-    <h4>
-        @Html.DisplayFor(model => model.Project.Title)
-        <input type="submit" value="Assign Users" class="btn btn-default pull-right" style="margin-top: -7px" />
-    </h4>
-    <hr />
-    @Html.HiddenFor(model => model.Project.Id)
-    @Html.ListBox("SelectedUsers", Model.Users)
+    <h2 style="margin-bottom: 20px">Edit Project Users | <span style="color: #00bca4">@Model.Project.Title</span> <input type="submit" value="Assign Users" class="btn btn-primary pull-right" /></h2>
+        <hr />
+        @Html.HiddenFor(model => model.Project.Id)
+        @Html.ListBox("SelectedUsers", Model.Users, new { @class = "multi-select" })
 }
 
 <div style="margin-top: 40px">
-    @Html.ActionLink("Back to Project Index", "Index")
+    @Html.ActionLink("Back to Projects", "Index")
 </div>
+
+@section Scripts {
+    <script type="text/javascript" src="../../assets/widgets/multi-select/multiselect.js"></script>
+    <script type="text/javascript">
+        /* Multiselect inputs */
+        $(function() { "use strict";
+            $('.multi-select').multiSelect({
+                selectableHeader: "<div class='custom-header' style='text-align: center; background-color: #031B25; color: white'><strong>Available Users</strong></div>",
+                selectionHeader: "<div class='custom-header' style='text-align: center; background-color: #031B25; color: white'><strong>Project Users</strong></div>"
+            });
+
+            $(".ms-container").append('<i class="glyph-icon icon-exchange"></i>');
+        });
+    </script>
+}
 
