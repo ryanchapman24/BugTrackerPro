@@ -1,16 +1,28 @@
 ﻿@model BugTrackerPro.Models.CodeFirst.Project
 @using BugTrackerPro.Models.Helpers;
+@using BugTrackerPro.Models.CodeFirst;
+@using Microsoft.AspNet.Identity;
 
 @{
     ViewBag.Title = "Details";
     var helper = new UserRolesHelper();
     List<string> compareList = new List<string> { "Admin", "Project Manager", "Developer", "Submitter" };
+    var userId = User.Identity.GetUserId();
+    var tickets = new List<Ticket>();
+    if (User.IsInRole("Admin") || User.IsInRole("Project Manager") || User.IsInRole("Developer"))
+    {
+        tickets = Model.Tickets.OrderByDescending(t => t.Id).ToList();
+    }
+    else if (User.IsInRole("Submitter"))
+    {
+        tickets = Model.Tickets.Where(t => t.OwnerUserId == userId).OrderByDescending(t => t.Id).ToList();
+    }
 }
 
 <div class="sb-slidebar bg-black sb-right sb-style-overlay">
     <div class="scrollable-content scrollable-slim-sidebar">
         <div class="pad10A" style="margin-top: 100px">
-            <div class="divider-header" style="color: #00a792; opacity: 1; font-size: 20px">Project Users</div>
+            <div class="divider-header" style="color: #00a792; opacity: 1; font-size: 20px">Project Users <span style="color: white">(@Model.Users.Count)</span></div>
             <hr style="border-color: white; margin-bottom: 30px"/>
             <ul class="chat-box">
                 @foreach (var member in Model.Users.OrderBy(u => u.FullName))
@@ -100,107 +112,234 @@
     </ul>
     <hr />
     <ul class="list-group list-group-separator row list-group-icons">
-        <li class="col-md-8 col-sm-12">
-            <div class="panel" style="min-height: 262px">
-                <div class="panel-body">
-                    <h3 class="title-hero">
-                        Tickets
-                    </h3>
-                    <div class="example-box-wrapper">
-                        <table id="datatable-tabletools" class="table table-striped table-bordered" cellspacing="0">
-                            <thead>
-                                <tr>
-                                    <th>
-                                        Ticket
-                                    </th>
-                                    <th>
-                                        Assigned Developer
-                                    </th>
-                                    <th>
-                                        Type
-                                    </th>
-                                    <th>
-                                        Status
-                                    </th>
-                                    <th>
-                                        Priority
-                                    </th>
-                                    <th>
-                                        Action
-                                    </th>
-                                </tr>
-                            </thead>
-                            @*<tfoot>
-                                <tr>
-                                    <th>
-                                        Ticket
-                                    </th>
-                                    <th>
-                                        Assigned Developer
-                                    </th>
-                                    <th>
-                                        Type
-                                    </th>
-                                    <th>
-                                        Status
-                                    </th>
-                                    <th>
-                                        Priority
-                                    </th>
-                                    <th>
-                                        Action
-                                    </th>
-                                </tr>
-                            </tfoot>*@
-                            <tbody>
-                                @foreach (var item in Model.Tickets)
-                                {
+        @if (User.IsInRole("Admin") || User.IsInRole("Project Manager") || User.IsInRole("Developer"))
+        {
+            <li class="col-md-8 col-sm-12">
+                <div class="panel" style="min-height: 262px">
+                    <div class="panel-body">
+                        <h3 class="title-hero">
+                            Tickets
+                        </h3>
+                        <div class="example-box-wrapper">
+                            <table id="datatable-tabletools" class="table table-striped table-bordered" cellspacing="0">
+                                <thead>
                                     <tr>
-                                        <td>
-                                            <strong>@item.Title</strong><br /><br />
-                                            <em class="text-no-wrap">Created by @item.OwnerUser.FullName</em><br />
-                                            <em class="text-no-wrap">@item.Created</em>
-                                        </td>
-                                        <td>
-                                            @if (item.AssignToUserId != null)
-                                            {
-                                                <span class="text-no-wrap">@item.AssignToUser.FullName</span>
-                                            }
-                                        </td>
-                                        <td>
-                                            @item.TicketType.Name
-                                        </td>
-                                        <td>
-                                            @item.TicketStatus.Name
-                                        </td>
-                                        <td>
-                                            @item.TicketPriority.Name
-                                        </td>
-                                        <td>
-                                            @Html.ActionLink("Details", "Details", "Tickets", new { id = item.Id }, null)<br />
-                                            @Html.ActionLink("Edit", "Edit", "Tickets", new { id = item.Id }, null)<br />
-                                            @Html.ActionLink("Delete", "Delete", "Tickets", new { id = item.Id }, null)
-                                        </td>
+                                        <th>
+                                            Ticket
+                                        </th>
+                                        <th>
+                                            Type
+                                        </th>
+                                        <th>
+                                            Priority
+                                        </th>
+                                        <th>
+                                            Status
+                                        </th>
+                                        <th>
+                                            Action
+                                        </th>
                                     </tr>
-                                }
-                            </tbody>
-                        </table>
+                                </thead>
+                                @*<tfoot>
+                                    <tr>
+                                        <th>
+                                            Ticket
+                                        </th>
+                                        <th>
+                                            Type
+                                        </th>
+                                        <th>
+                                            Priority
+                                        </th>
+                                        <th>
+                                            Status
+                                        </th>
+                                        <th>
+                                            Action
+                                        </th>
+                                    </tr>
+                                </tfoot>*@
+                                <tbody>
+                                    @foreach (var item in tickets)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <span class="bs-label label-primary"><strong>#<span style="margin-left: 3px">@item.Id</span></strong></span><br /><br />
+                                                <strong class="text-nowrap">@item.Title</strong><br />
+                                                <em class="text-no-wrap">Created by @item.OwnerUser.FullName</em><br />
+                                                <em class="text-no-wrap">@item.Created.ToString("MM/dd/yyyy") at @item.Created.ToString("h:mm tt")</em>
+                                            </td>
+                                            <td>
+                                                @item.TicketType.Name
+                                            </td>
+                                            <td>
+                                                @if (item.TicketPriority.Name == "Low")
+                                                {
+                                                    <br /><span class="bs-label label-blue-alt">@item.TicketPriority.Name</span><br /><br />
+                                                }
+                                                else if (item.TicketPriority.Name == "Medium")
+                                                {
+                                                    <br /><span class="bs-label label-yellow" style="margin-bottom: -20px">@item.TicketPriority.Name</span><br /><br />
+                                                }
+                                                else if (item.TicketPriority.Name == "High")
+                                                {
+                                                    <br /><span class="bs-label label-warning">@item.TicketPriority.Name</span><br /><br />
+                                                }
+                                                else if (item.TicketPriority.Name == "Critical")
+                                                {
+                                                    <br /><span class="bs-label label-danger">@item.TicketPriority.Name</span><br /><br />
+                                                }
+                                            </td>
+                                            <td>
+                                                @item.TicketStatus.Name
+                                                @if (item.AssignToUserId != null)
+                                                {
+                                                    <br /><br /><em>Assigned to: </em><strong style="color: #00bca4">@item.AssignToUser.FullName</strong>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (item.AssignToUserId != null)
+                                                {
+                                                    @Html.ActionLink("Reassign", "AssignDeveloper", "Tickets", new { id = item.Id }, null)<br />
+                                                }
+                                                else
+                                                {
+                                                    @Html.ActionLink("Assign", "AssignDeveloper", "Tickets", new { id = item.Id }, null)<br />
+                                                }
+                                                @if (User.IsInRole("Admin") || User.IsInRole("Project Manager") || (User.IsInRole("Developer") && item.AssignToUserId == userId))
+                                                {
+                                                    @Html.ActionLink("Details", "Details", "Tickets", new { id = item.Id }, null)<br />
+                                                    @Html.ActionLink("Edit", "Edit", "Tickets", new { id = item.Id }, null)<br />
+                                                }
+                                                @if (User.IsInRole("Admin"))
+                                                {
+                                                    @Html.ActionLink("Delete", "Delete", "Tickets", new { id = item.Id }, null)
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>     
+            </li>
+        }
+        else
+        {
+            <li class="col-md-12">
+                <div class="panel" style="min-height: 262px">
+                    <div class="panel-body">
+                        <h3 class="title-hero">
+                            Tickets
+                        </h3>
+                        <div class="example-box-wrapper">
+                            <table id="datatable-tabletools" class="table table-striped table-bordered" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Ticket
+                                        </th>
+                                        <th>
+                                            Type
+                                        </th>
+                                        <th>
+                                            Priority
+                                        </th>
+                                        <th>
+                                            Status
+                                        </th>
+                                        <th>
+                                            Action
+                                        </th>
+                                    </tr>
+                                </thead>
+                                @*<tfoot>
+                                        <tr>
+                                            <th>
+                                                Ticket
+                                            </th>
+                                            <th>
+                                                Type
+                                            </th>
+                                            <th>
+                                                Priority
+                                            </th>
+                                            <th>
+                                                Status
+                                            </th>
+                                            <th>
+                                                Action
+                                            </th>
+                                        </tr>
+                                    </tfoot>*@
+                                <tbody>
+                                    @foreach (var item in tickets)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <span class="bs-label label-primary"><strong>#<span style="margin-left: 3px">@item.Id</span></strong></span><br /><br />
+                                                <strong class="text-nowrap">@item.Title</strong><br />
+                                                <em class="text-no-wrap">Created by @item.OwnerUser.FullName</em><br />
+                                                <em class="text-no-wrap">@item.Created.ToString("MM/dd/yyyy") at @item.Created.ToString("h:mm tt")</em>
+                                            </td>
+                                            <td>
+                                                @item.TicketType.Name
+                                            </td>
+                                            <td>
+                                                @if (item.TicketPriority.Name == "Low")
+                                                {
+                                                    <br /><span class="bs-label label-blue-alt">@item.TicketPriority.Name</span><br /><br />
+                                                }
+                                                else if (item.TicketPriority.Name == "Medium")
+                                                {
+                                                    <br /><span class="bs-label label-yellow" style="margin-bottom: -20px">@item.TicketPriority.Name</span><br /><br />
+                                                }
+                                                else if (item.TicketPriority.Name == "High")
+                                                {
+                                                    <br /><span class="bs-label label-warning">@item.TicketPriority.Name</span><br /><br />
+                                                }
+                                                else if (item.TicketPriority.Name == "Critical")
+                                                {
+                                                    <br /><span class="bs-label label-danger">@item.TicketPriority.Name</span><br /><br />
+                                                }
+                                            </td>
+                                            <td>
+                                                @item.TicketStatus.Name
+                                                @if (item.AssignToUserId != null)
+                                                {
+                                                    <br /><br /><em>Assigned to: </em><strong style="color: #00bca4">@item.AssignToUser.FullName</strong>
+                                                }
+                                            </td>
+                                            <td>
+                                                @Html.ActionLink("Details", "Details", "Tickets", new { id = item.Id }, null)<br />
+                                                @Html.ActionLink("Edit", "Edit", "Tickets", new { id = item.Id }, null)<br />
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>     
-        </li>
-        <li class="col-md-4 col-sm-12">
-            <div class="panel">
-                <div class="panel-body">
-                    <h3 class="title-hero">
-                        Ticket Breakdown
-                    </h3>
-                    <div class="example-box-wrapper clearfix">
-                        <div id="data-test" style="width: 100%; height: 200px;"></div>
+            </li>
+        }
+        @if (User.IsInRole("Admin") || User.IsInRole("Project Manager"))
+        {
+            <li class="col-md-4 col-sm-12">
+                <div class="panel">
+                    <div class="panel-body">
+                        <h3 class="title-hero">
+                            Ticket Breakdown
+                        </h3>
+                        <div class="example-box-wrapper clearfix">
+                            <div id="data-test" style="width: 100%; height: 200px;"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </li>
+            </li>
+        }
     </ul>
 </div>
 
@@ -238,8 +377,8 @@
             }
             var dataSet = [
                 { label: "Complete", data: @complete, color: getUIColor('primary') },
-                { label: "In Progress", data: @inProgress, color: getUIColor('warning') },
-                { label: "Assigned", data: @assigned, color: getUIColor('info') },
+                { label: "In Progress", data: @inProgress, color: getUIColor('blue-alt') },
+                { label: "Assigned", data: @assigned, color: getUIColor('yellow') },
                 { label: "Unassigned", data: @unassigned, color: getUIColor('danger') }
             ];
 

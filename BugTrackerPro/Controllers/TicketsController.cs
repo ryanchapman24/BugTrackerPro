@@ -9,6 +9,7 @@ using System.Web.Mvc;
 using BugTrackerPro.Models;
 using BugTrackerPro.Models.CodeFirst;
 using Microsoft.AspNet.Identity;
+using BugTrackerPro.Models.Helpers;
 
 namespace BugTrackerPro.Controllers
 {
@@ -84,7 +85,7 @@ namespace BugTrackerPro.Controllers
             {
                 projects = user.Projects.OrderBy(p => p.Title).ToList();
             }
-            ViewBag.ProjectId = new SelectList(db.Projects, "Id", "Title", ticket.ProjectId);
+            ViewBag.ProjectId = new SelectList(projects, "Id", "Title", ticket.ProjectId);
             ViewBag.TicketPriorityId = new SelectList(db.TicketPriorities, "Id", "Name", ticket.TicketPriorityId);
             ViewBag.TicketTypeId = new SelectList(db.TicketTypes, "Id", "Name", ticket.TicketTypeId);
             return View(ticket);
@@ -93,6 +94,7 @@ namespace BugTrackerPro.Controllers
         // GET: Tickets/Edit/5
         public ActionResult Edit(int? id)
         {
+            var user = db.Users.Find(User.Identity.GetUserId());
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -102,7 +104,16 @@ namespace BugTrackerPro.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.ProjectId = new SelectList(db.Projects, "Id", "Title", ticket.ProjectId);
+            List<Project> projects = new List<Project>();
+            if (User.IsInRole("Admin"))
+            {
+                projects = db.Projects.OrderBy(p => p.Title).ToList();
+            }
+            else
+            {
+                projects = user.Projects.OrderBy(p => p.Title).ToList();
+            }
+            ViewBag.ProjectId = new SelectList(projects, "Id", "Title", ticket.ProjectId);
             ViewBag.TicketPriorityId = new SelectList(db.TicketPriorities, "Id", "Name", ticket.TicketPriorityId);
             ViewBag.TicketStatusId = new SelectList(db.TicketStatuses, "Id", "Name", ticket.TicketStatusId);
             ViewBag.TicketTypeId = new SelectList(db.TicketTypes, "Id", "Name", ticket.TicketTypeId);
@@ -114,18 +125,99 @@ namespace BugTrackerPro.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,Title,Description,Created,Updated,ProjectId,TicketTypeId,TicketPriorityId,TicketStatusId,OwnerUserId,AssignToUserId")] Ticket ticket)
+        public ActionResult Edit([Bind(Include = "Id,Title,Description,Created,ProjectId,TicketTypeId,TicketPriorityId,TicketStatusId,OwnerUserId,AssignToUserId")] Ticket ticket)
         {
+            var user = db.Users.Find(User.Identity.GetUserId());
+
+            var oldTicket = db.Tickets.AsNoTracking().First(t => t.Id == ticket.Id);
+
+            //if (oldTicket.Title != ticket.Title)
+            //{
+
+            //}
+
             if (ModelState.IsValid)
             {
-                db.Entry(ticket).State = EntityState.Modified;
+                db.Tickets.Attach(ticket);
+                db.Entry(ticket).Property("Title").IsModified = true;
+                db.Entry(ticket).Property("Description").IsModified = true;
+                db.Entry(ticket).Property("Updated").IsModified = true;
+                db.Entry(ticket).Property("ProjectId").IsModified = true;
+                db.Entry(ticket).Property("TicketTypeId").IsModified = true;
+                db.Entry(ticket).Property("TicketPriorityId").IsModified = true;
+                db.Entry(ticket).Property("TicketStatusId").IsModified = true;
+                ticket.Updated = System.DateTime.Now;
                 db.SaveChanges();
-                return RedirectToAction("Index");
+
+                return RedirectToAction("Details", "Projects", new { id = ticket.ProjectId });
+            }
+            List<Project> projects = new List<Project>();
+            if (User.IsInRole("Admin"))
+            {
+                projects = db.Projects.OrderBy(p => p.Title).ToList();
+            }
+            else
+            {
+                projects = user.Projects.OrderBy(p => p.Title).ToList();
             }
             ViewBag.ProjectId = new SelectList(db.Projects, "Id", "Title", ticket.ProjectId);
             ViewBag.TicketPriorityId = new SelectList(db.TicketPriorities, "Id", "Name", ticket.TicketPriorityId);
             ViewBag.TicketStatusId = new SelectList(db.TicketStatuses, "Id", "Name", ticket.TicketStatusId);
             ViewBag.TicketTypeId = new SelectList(db.TicketTypes, "Id", "Name", ticket.TicketTypeId);
+            return View(ticket);
+        }
+
+        // GET: Tickets/Edit/5
+        public ActionResult AssignDeveloper(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Ticket ticket = db.Tickets.Find(id);
+            if (ticket == null)
+            {
+                return HttpNotFound();
+            }
+
+            UserRolesHelper helper = new UserRolesHelper();
+            var developers = helper.UsersInRole("Developer");
+            var devsOnProj = developers.Where(d => d.Projects.Any(p => p.Id == ticket.ProjectId));
+            ViewBag.AssignToUserId = new SelectList(devsOnProj, "Id", "FullName", ticket.AssignToUserId);
+            return View(ticket);
+        }
+
+        // POST: Tickets/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult AssignDeveloper([Bind(Include = "Id,Title,Description,Created,ProjectId,TicketTypeId,TicketPriorityId,TicketStatusId,OwnerUserId,AssignToUserId")] Ticket ticket)
+        {
+            var oldTicket = db.Tickets.AsNoTracking().First(t => t.Id == ticket.Id);
+
+            //if (oldTicket.Title != ticket.Title)
+            //{
+
+            //}
+
+            if (ModelState.IsValid)
+            {
+                db.Tickets.Attach(ticket);
+                db.Entry(ticket).Property("Updated").IsModified = true;
+                db.Entry(ticket).Property("AssignToUserId").IsModified = true;
+                db.Entry(ticket).Property("TicketStatusId").IsModified = true;
+                ticket.Updated = System.DateTime.Now;
+                ticket.TicketStatusId = 2;
+                db.SaveChanges();
+
+                return RedirectToAction("Details", "Projects", new { id = oldTicket.ProjectId });
+            }
+
+            UserRolesHelper helper = new UserRolesHelper();
+            var developers = helper.UsersInRole("Developer");
+            var devsOnProj = developers.Where(d => d.Projects.Any(p => p.Id == ticket.ProjectId));
+            ViewBag.AssignToUserId = new SelectList(devsOnProj, "Id", "FullName", ticket.AssignToUserId);
             return View(ticket);
         }
 

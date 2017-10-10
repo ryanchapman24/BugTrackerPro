@@ -35,6 +35,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <FilesToIncludeForPublish>AllFilesInProjectFolder</FilesToIncludeForPublish>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -219,6 +220,7 @@
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ImageUploadValidator.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\ProjectsAndTicketsViewModels.cs" />
     <Compile Include="Models\ProjectUserViewModels.cs" />
     <Compile Include="Models\Universal.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -1254,11 +1256,12 @@
     <Content Include="Views\Shared\_TemplateLayout.cshtml" />
     <Content Include="Views\Shared\_LoginLayout.cshtml" />
     <Content Include="Views\Manage\UpdateInformation.cshtml" />
+    <Content Include="Views\Tickets\AssignDeveloper.cshtml" />
+    <Content Include="Views\Home\Error.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="ProfilePics\" />
-    <Folder Include="Views\TicketComments\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

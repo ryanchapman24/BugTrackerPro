@@ -127,7 +127,8 @@ var mUIColors = {
     'success':      '#2ecc71',
     'warning':      '#e67e22',
     'danger':       '#e74c3c',
-    'info':         '#3498db'
+    'info':         '#3498db',
+    'yellow':       '#ffcc00'
 };
 
 var getUIColor = function (name) {
