@@ -346,7 +346,9 @@
 @section Scripts {
     <script type="text/javascript">
         $(window).load(function () {
-            var table = $('#datatable-tabletools').DataTable();
+            var table = $('#datatable-tabletools').DataTable({
+                "order": [[0, "desc"]]
+            });
             var tt = new $.fn.dataTable.TableTools(table);
 
             $(tt.fnContainer()).insertBefore('#datatable-tabletools_wrapper div.dataTables_filter');

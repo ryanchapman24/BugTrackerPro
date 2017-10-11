@@ -1189,6 +1189,8 @@
     <Content Include="assets\widgets\ckeditor\plugins\wsc\LICENSE.md" />
     <Content Include="assets\widgets\ckeditor\plugins\wsc\README.md" />
     <Content Include="assets\widgets\ckeditor\skins\bootstrapck\readme.md" />
+    <None Include="Properties\PublishProfiles\chaptracker - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\chaptracker - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-3.2.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
