@@ -1264,6 +1264,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="ProfilePics\" />
+    <Folder Include="TicketAttachments\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

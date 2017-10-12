@@ -592,6 +592,10 @@
 .border-red {
     border-color: #ff5757 !important;
 }
+
+.border-primary {
+    border-color: #00bca4 !important;
+}
 /* Box Shadow Colors */
 
 .parsley-success {
