@@ -42,7 +42,7 @@
         <div class="form-group">
             <label class="control-label col-md-2">Description</label>
             <div class="col-md-6">
-                <textarea name="Description" rows="6" style="width: 100%" required>@Model.Description</textarea>
+                <textarea  class="form-control" name="Description" rows="6" style="width: 100%" required>@Model.Description</textarea>
                 @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
             </div>
         </div>

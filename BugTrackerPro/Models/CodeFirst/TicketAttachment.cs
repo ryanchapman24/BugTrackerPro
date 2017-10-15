@@ -12,6 +12,8 @@ namespace BugTrackerPro.Models.CodeFirst
         public DateTimeOffset Created { get; set; }
         public string AuthorId { get; set; }
         public string FileUrl { get; set; }
+        public string Extension { get; set; }
+        public string FileName { get; set; }
 
         public virtual Ticket Ticket { get; set; }
         public virtual ApplicationUser Author { get; set; }

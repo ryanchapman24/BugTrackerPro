@@ -234,35 +234,80 @@ namespace BugTrackerPro.Controllers
         {
             foreach (var doc in file)
             {
-                //Counter
-                var num = 0;
-                //Gets Filename without the extension
-                var fileName = Path.GetFileNameWithoutExtension(doc.FileName);
-                var attach = fileName + Path.GetExtension(doc.FileName);
-                //Checks if pPic matches any of the current attachments, 
-                //if so it will loop and add a (number) to the end of the filename
-                while (db.TicketAttachments.Where(a => a.TicketId == ticketId).Any(a => a.FileUrl == attach))
+                if (FileUploadValidator.IsWebFriendlyFile(doc))
                 {
-                    //Sets "filename" back to the default value
-                    fileName = Path.GetFileNameWithoutExtension(doc.FileName);
-                    //Add's parentheses after the name with a number ex. filename(4)
-                    fileName = string.Format(fileName + "(" + ++num + ")");
-                    //Makes sure pPic gets updated with the new filename so it could check
-                    attach = fileName + Path.GetExtension(doc.FileName);
+                    //Counter
+                    var num = 0;
+                    //Gets Filename without the extension
+                    var fileName = Path.GetFileNameWithoutExtension(doc.FileName);
+                    var attach = fileName + Path.GetExtension(doc.FileName);
+                    var ext = Path.GetExtension(doc.FileName);
+                    //Checks if pPic matches any of the current attachments, 
+                    //if so it will loop and add a (number) to the end of the filename
+                    while (db.TicketAttachments.Where(a => a.TicketId == ticketId).Any(a => a.FileUrl == attach))
+                    {
+                        //Sets "filename" back to the default value
+                        fileName = Path.GetFileNameWithoutExtension(doc.FileName);
+                        //Add's parentheses after the name with a number ex. filename(4)
+                        fileName = string.Format(fileName + "(" + ++num + ")");
+                        //Makes sure pPic gets updated with the new filename so it could check
+                        attach = fileName + Path.GetExtension(doc.FileName);
+                    }
+                    doc.SaveAs(Path.Combine(Server.MapPath("~/TicketAttachments/" + ticketId), fileName + Path.GetExtension(doc.FileName)));
+
+                    TicketAttachment attachment = new TicketAttachment();
+                    attachment.Created = DateTime.Now;
+                    attachment.AuthorId = User.Identity.GetUserId();
+                    attachment.TicketId = ticketId;
+                    attachment.FileUrl = attach;
+                    attachment.FileName = fileName;
+                    attachment.Extension = ext.Substring(1, ext.Length -1);
+
+                    db.TicketAttachments.Add(attachment);
+                    db.SaveChanges();              
                 }
-                doc.SaveAs(Path.Combine(Server.MapPath("~/TicketAttachments/" + ticketId), fileName + Path.GetExtension(doc.FileName)));
-
-                TicketAttachment attachment = new TicketAttachment();
-                attachment.Created = System.DateTime.Now;
-                attachment.AuthorId = User.Identity.GetUserId();
-                attachment.TicketId = ticketId;
-                attachment.FileUrl = attach;
-
-                db.TicketAttachments.Add(attachment);
-                db.SaveChanges();              
             }
 
             return RedirectToAction("Details", new { id = ticketId });
+        }
+
+        // GET: Tickets/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteAttachment(int id)
+        {
+            TicketAttachment ticketAttachment = db.TicketAttachments.Find(id);
+            db.TicketAttachments.Remove(ticketAttachment);
+            db.SaveChanges();
+
+            if ((System.IO.File.Exists("~/TicketAttachments/" + ticketAttachment.TicketId + "/" + ticketAttachment.FileUrl)))
+            {
+                System.IO.File.Delete("~/TicketAttachments/" + ticketAttachment.TicketId + "/" + ticketAttachment.FileUrl);
+            }
+
+            return Redirect(Url.Action("Details", "Tickets", new { id = ticketAttachment.TicketId }) + "#Comments");
+        }
+
+        // POST: Tickets/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult AddComment(string body, int ticketId)
+        {
+            if (body != null)
+            {              
+                TicketComment comment = new TicketComment();
+                comment.Created = DateTime.Now;
+                comment.AuthorId = User.Identity.GetUserId();
+                comment.TicketId = ticketId;
+                comment.Body = body;
+
+                db.TicketComments.Add(comment);
+                db.SaveChanges();
+            }
+
+            return Redirect(Url.Action("Details", "Tickets", new { id = ticketId }) + "#Comments");
         }
 
         // GET: Tickets/Delete/5

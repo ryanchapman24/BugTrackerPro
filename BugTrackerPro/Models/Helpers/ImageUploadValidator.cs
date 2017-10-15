@@ -5,7 +5,7 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Web;
 
-namespace BugTrackerPro
+namespace BugTrackerPro.Models.Helpers
 {
     public class ImageUploadValidator
     {

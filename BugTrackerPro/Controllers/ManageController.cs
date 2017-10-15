@@ -8,6 +8,7 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using BugTrackerPro.Models;
 using System.IO;
+using BugTrackerPro.Models.Helpers;
 
 namespace BugTrackerPro.Controllers
 {
