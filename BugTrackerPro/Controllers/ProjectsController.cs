@@ -137,15 +137,16 @@ namespace BugTrackerPro.Controllers
         [Authorize(Roles = "Admin, Project Manager")]
         public ActionResult EditProjectAssignments(ProjectUserViewModels model)
         {
-
+            var userId = db.Users.Find(User.Identity.GetUserId()).Id;
             var project = db.Projects.Find(model.Project.Id);
             db.Entry(project).Property("Updated").IsModified = true;
-            project.Updated = System.DateTime.Now;
+            project.Updated = DateTime.Now;
             ProjectAssignmentsHelper helper = new ProjectAssignmentsHelper();
+            var projUsers = project.Users;
 
-            foreach (var user in db.Users.Select(u => u.Id).ToList())
+            foreach (var user in projUsers)
             {
-                helper.RemoveUserFromProject(user, project.Id);
+                helper.RemoveUserFromProject(user.Id, project.Id);
             }
 
             if (model.SelectedUsers != null)
@@ -153,16 +154,30 @@ namespace BugTrackerPro.Controllers
                 foreach (var user in model.SelectedUsers)
                 {
                     helper.AddUserToProject(user, project.Id);
+                    var addedUser = db.Users.Find(user);
+                    projUsers.Remove(addedUser);
                 }
-
-                return RedirectToAction("Index");
             }
 
-            else
+            foreach (var user in projUsers)
             {
-                return RedirectToAction("Index");
+                foreach (var ticket in project.Tickets.Where(t => t.AssignToUserId == user.Id))
+                {
+                    ticket.AssignToUserId = null;
+                    ticket.TicketStatusId = 1;
+
+                    TicketHistory th = new TicketHistory();
+                    th.Property = "ASSIGNMENT REMOVED (Developer removed from Project)";
+                    th.AuthorId = userId;
+                    th.TicketId = ticket.Id;
+                    th.Created = DateTime.Now;
+                    th.OldValue = ticket.AssignToUser.FullName;
+                    db.TicketHistories.Add(th);
+                    db.SaveChanges();
+                }
             }
 
+            return RedirectToAction("Index");
         }
 
         // GET: Projects/Delete/5
