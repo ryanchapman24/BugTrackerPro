@@ -1,4 +1,5 @@
 ﻿using BugTrackerPro.Models;
+using BugTrackerPro.Models.CodeFirst;
 using BugTrackerPro.Models.Helpers;
 using System;
 using System.Collections.Generic;
@@ -46,6 +47,7 @@ namespace BugTrackerPro.Controllers
         {
             var user = db.Users.Find(model.User.Id);
             UserRolesHelper helper = new UserRolesHelper();
+            var wasDev = helper.IsUserInRole(user.Id, "Developer");
 
             foreach (var role in db.Roles.Select(r => r.Name).ToList())
             {
@@ -58,8 +60,42 @@ namespace BugTrackerPro.Controllers
                 {
                     helper.AddUserToRole(user.Id, role);
                 }
+            }
 
-                return RedirectToAction("Index");
+            if (wasDev == true && (model.SelectedRoles == null || !model.SelectedRoles.Contains("Developer")))
+            {
+                foreach (var ticket in db.Tickets.AsNoTracking().Where(t => t.AssignToUserId == user.Id).ToList())
+                {
+                    var oldTicket = db.Tickets.AsNoTracking().First(t => t.Id == ticket.Id);
+                    ticket.AssignToUserId = null;
+
+                    TicketHistory th = new TicketHistory();
+                    th.Property = "ASSIGNMENT REMOVED (Developer no longer in role)";
+                    th.AuthorId = user.Id;
+                    th.TicketId = ticket.Id;
+                    th.Created = DateTime.Now;
+                    th.OldValue = oldTicket.AssignToUser.FullName;
+                    db.TicketHistories.Add(th);
+
+                    if (ticket.TicketStatusId != 4)
+                    {
+                        ticket.TicketStatusId = 1;
+
+                        TicketHistory th2 = new TicketHistory();
+                        th2.Property = "STATUS";
+                        th2.AuthorId = user.Id;
+                        th2.TicketId = ticket.Id;
+                        th2.Created = DateTime.Now;
+                        th2.OldValue = oldTicket.TicketStatus.Name;
+                        th2.NewValue = db.TicketStatuses.Find(1).Name;
+                        db.TicketHistories.Add(th2);
+                    }
+
+                    db.Tickets.Attach(ticket);
+                    db.Entry(ticket).Property("AssignToUserId").IsModified = true;
+                    db.Entry(ticket).Property("TicketStatusId").IsModified = true;
+                    db.SaveChanges();
+                }
             }
 
             return RedirectToAction("Index");

@@ -161,18 +161,36 @@ namespace BugTrackerPro.Controllers
 
             foreach (var user in projUsers)
             {
-                foreach (var ticket in project.Tickets.Where(t => t.AssignToUserId == user.Id))
+                foreach (var ticket in project.Tickets.Where(t => t.AssignToUserId == user.Id).ToList())
                 {
+                    var oldTicket = db.Tickets.AsNoTracking().First(t => t.Id == ticket.Id);
                     ticket.AssignToUserId = null;
-                    ticket.TicketStatusId = 1;
 
                     TicketHistory th = new TicketHistory();
                     th.Property = "ASSIGNMENT REMOVED (Developer removed from Project)";
                     th.AuthorId = userId;
                     th.TicketId = ticket.Id;
                     th.Created = DateTime.Now;
-                    th.OldValue = ticket.AssignToUser.FullName;
+                    th.OldValue = oldTicket.AssignToUser.FullName;
                     db.TicketHistories.Add(th);
+
+                    if (ticket.TicketStatusId != 4)
+                    {
+                        ticket.TicketStatusId = 1;
+
+                        TicketHistory th2 = new TicketHistory();
+                        th2.Property = "STATUS";
+                        th2.AuthorId = user.Id;
+                        th2.TicketId = ticket.Id;
+                        th2.Created = DateTime.Now;
+                        th2.OldValue = oldTicket.TicketStatus.Name;
+                        th2.NewValue = db.TicketStatuses.Find(1).Name;
+                        db.TicketHistories.Add(th2);
+                    }
+
+                    db.Tickets.Attach(ticket);
+                    db.Entry(ticket).Property("AssignToUserId").IsModified = true;
+                    db.Entry(ticket).Property("TicketStatusId").IsModified = true;
                     db.SaveChanges();
                 }
             }

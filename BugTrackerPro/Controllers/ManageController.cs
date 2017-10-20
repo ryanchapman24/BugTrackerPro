@@ -295,7 +295,7 @@ namespace BugTrackerPro.Controllers
             }
 
             var defaultMedia = "/assets/icons/bug_icon.png";
-            if (String.IsNullOrWhiteSpace(user.ProfilePic))
+            if (String.IsNullOrWhiteSpace(model.ProfilePic))
             {
                 pPic = defaultMedia;
             }

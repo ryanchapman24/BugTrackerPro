@@ -79,6 +79,14 @@ namespace BugTrackerPro.Controllers
                 var path = Server.MapPath("~/TicketAttachments/" + ticket.Id);
                 Directory.CreateDirectory(path);
 
+                TicketHistory th = new TicketHistory();
+                th.Property = "TICKET CREATED";
+                th.AuthorId = user.Id;
+                th.TicketId = ticket.Id;
+                th.Created = DateTime.Now;
+                db.TicketHistories.Add(th);
+                db.SaveChanges();
+
                 return RedirectToAction("Details", "Tickets", new { id = ticket.Id });
             }
 
@@ -159,7 +167,6 @@ namespace BugTrackerPro.Controllers
                     th.OldValue = oldTicket.Title;
                     th.NewValue = ticket.Title;
                     db.TicketHistories.Add(th);
-                    db.SaveChanges();
                 }
 
                 if (oldTicket.Description != ticket.Description)
@@ -172,7 +179,6 @@ namespace BugTrackerPro.Controllers
                     th.OldValue = oldTicket.Description;
                     th.NewValue = ticket.Description;
                     db.TicketHistories.Add(th);
-                    db.SaveChanges();
                 }
 
                 if (oldTicket.TicketStatusId != ticket.TicketStatusId)
@@ -185,7 +191,6 @@ namespace BugTrackerPro.Controllers
                     th.OldValue = oldTicket.TicketStatus.Name;
                     th.NewValue = db.TicketStatuses.Find(ticket.TicketStatusId).Name;
                     db.TicketHistories.Add(th);
-                    db.SaveChanges();
                 }
 
                 if (oldTicket.TicketPriorityId != ticket.TicketPriorityId)
@@ -198,7 +203,6 @@ namespace BugTrackerPro.Controllers
                     th.OldValue = oldTicket.TicketPriority.Name;
                     th.NewValue = db.TicketPriorities.Find(ticket.TicketPriorityId).Name;
                     db.TicketHistories.Add(th);
-                    db.SaveChanges();
                 }
 
                 if (oldTicket.TicketTypeId != ticket.TicketTypeId)
@@ -211,7 +215,6 @@ namespace BugTrackerPro.Controllers
                     th.OldValue = oldTicket.TicketType.Name;
                     th.NewValue = db.TicketTypes.Find(ticket.TicketTypeId).Name;
                     db.TicketHistories.Add(th);
-                    db.SaveChanges();
                 }
 
                 if (oldTicket.ProjectId != ticket.ProjectId)
@@ -224,7 +227,6 @@ namespace BugTrackerPro.Controllers
                     th.OldValue = oldTicket.Project.Title;
                     th.NewValue = db.Projects.Find(ticket.ProjectId).Title;
                     db.TicketHistories.Add(th);
-                    db.SaveChanges();
 
                     var newProj = db.Projects.Find(ticket.ProjectId);
                     if (oldTicket.AssignToUserId != null)
@@ -241,7 +243,19 @@ namespace BugTrackerPro.Controllers
                             th2.Created = DateTime.Now;
                             th2.OldValue = oldTicket.AssignToUser.FullName;
                             db.TicketHistories.Add(th2);
-                            db.SaveChanges();
+
+                            if (ticket.TicketStatusId != 4)
+                            {
+                                ticket.TicketStatusId = 1;
+                                TicketHistory th3 = new TicketHistory();
+                                th3.Property = "STATUS";
+                                th3.AuthorId = user.Id;
+                                th3.TicketId = ticket.Id;
+                                th3.Created = DateTime.Now;
+                                th3.OldValue = oldTicket.TicketStatus.Name;
+                                th3.NewValue = db.TicketStatuses.Find(1).Name;
+                                db.TicketHistories.Add(th3);
+                            }
                         }
                     }
                 }
@@ -304,7 +318,10 @@ namespace BugTrackerPro.Controllers
                 db.Entry(ticket).Property("AssignToUserId").IsModified = true;
                 db.Entry(ticket).Property("TicketStatusId").IsModified = true;
                 ticket.Updated = DateTime.Now;
-                ticket.TicketStatusId = 2;
+                if (ticket.TicketStatusId == 1)
+                {
+                    ticket.TicketStatusId = 2;
+                }
 
                 if (oldTicket.AssignToUserId != ticket.AssignToUserId)
                 {
@@ -352,6 +369,9 @@ namespace BugTrackerPro.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult AddAttachment(IEnumerable<HttpPostedFileBase> file, int ticketId)
         {
+            var user = db.Users.Find(User.Identity.GetUserId());
+            var oldTicket = db.Tickets.AsNoTracking().First(t => t.Id == ticketId);
+
             foreach (var doc in file)
             {
                 if (FileUploadValidator.IsWebFriendlyFile(doc))
@@ -382,9 +402,17 @@ namespace BugTrackerPro.Controllers
                     attachment.FileUrl = attach;
                     attachment.FileName = fileName;
                     attachment.Extension = ext.Substring(1, ext.Length -1);
-
                     db.TicketAttachments.Add(attachment);
-                    db.SaveChanges();              
+                    db.SaveChanges();
+
+                    TicketHistory th = new TicketHistory();
+                    th.Property = "NEW ATTACHMENT";
+                    th.AuthorId = user.Id;
+                    th.TicketId = ticketId;
+                    th.Created = DateTime.Now;
+                    th.NewValue = attachment.FileUrl;
+                    db.TicketHistories.Add(th);
+                    db.SaveChanges();
                 }
             }
 
@@ -396,16 +424,30 @@ namespace BugTrackerPro.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteAttachment(int id)
         {
+            var user = db.Users.Find(User.Identity.GetUserId());
             TicketAttachment ticketAttachment = db.TicketAttachments.Find(id);
+            var oldTicket = db.Tickets.AsNoTracking().First(t => t.Id == ticketAttachment.TicketId);
+            var fileUrl = ticketAttachment.FileUrl;
             db.TicketAttachments.Remove(ticketAttachment);
             db.SaveChanges();
 
-            if ((System.IO.File.Exists("~/TicketAttachments/" + ticketAttachment.TicketId + "/" + ticketAttachment.FileUrl)))
+            TicketHistory th = new TicketHistory();
+            th.Property = "ATTACHMENT DELETED";
+            th.AuthorId = user.Id;
+            th.TicketId = oldTicket.Id;
+            th.Created = DateTime.Now;
+            th.OldValue = fileUrl;
+            db.TicketHistories.Add(th);
+            db.SaveChanges();
+
+            if (fileUrl != null)
             {
-                System.IO.File.Delete("~/TicketAttachments/" + ticketAttachment.TicketId + "/" + ticketAttachment.FileUrl);
+                var filePath = Server.MapPath("~/TicketAttachments/" + oldTicket.Id + "/" + fileUrl);
+                System.IO.File.Delete(filePath);
             }
 
-            return Redirect(Url.Action("Details", "Tickets", new { id = ticketAttachment.TicketId }) + "#Comments");
+
+            return Redirect(Url.Action("Details", "Tickets", new { id = oldTicket.Id }) + "#Comments");
         }
 
         // POST: Tickets/Edit/5
@@ -415,6 +457,9 @@ namespace BugTrackerPro.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult AddComment(string body, int ticketId)
         {
+            var user = db.Users.Find(User.Identity.GetUserId());
+            var oldTicket = db.Tickets.AsNoTracking().First(t => t.Id == ticketId);
+
             if (body != null)
             {              
                 TicketComment comment = new TicketComment();
@@ -422,8 +467,16 @@ namespace BugTrackerPro.Controllers
                 comment.AuthorId = User.Identity.GetUserId();
                 comment.TicketId = ticketId;
                 comment.Body = body;
-
                 db.TicketComments.Add(comment);
+                db.SaveChanges();
+
+                TicketHistory th = new TicketHistory();
+                th.Property = "NEW COMMENT";
+                th.AuthorId = user.Id;
+                th.TicketId = ticketId;
+                th.Created = DateTime.Now;
+                th.NewValue = comment.Body;
+                db.TicketHistories.Add(th);
                 db.SaveChanges();
             }
 

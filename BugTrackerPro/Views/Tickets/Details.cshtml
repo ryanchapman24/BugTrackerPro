@@ -44,8 +44,6 @@
     });
 </script>
 
-<h2 style="margin-bottom: 20px">Ticket Details | <span style="color: #00bca4">#@Model.Id - @Model.Title</span><a href="@Url.Action("Index", "Home")" class="btn btn-black pull-right"><i class="glyph-icon icon-linecons-tag" style="margin-right: 10px"></i>Back to Tickets</a></h2>
-
 <div class="example-box-wrapper">
     <ul id="myTab" class="nav clearfix nav-tabs right-to-left">
         <li class="tabsy"><a href="#history" data-toggle="tab" style="text-decoration: none; border-right: 1px solid #dfe8f1; border-left: 1px solid #dfe8f1; border-top: 1px solid #dfe8f1; padding-left: 50px; padding-right: 50px">History</a></li>
@@ -53,6 +51,7 @@
     </ul>
     <div id="myTabContent" class="tab-content">
         <div class="tab-pane fade active in" id="details">
+            <h2 style="margin-bottom: 40px">Ticket Details | <span style="color: #00bca4">#@Model.Id - @Model.Title</span><a href="@Url.Action("Index", "Home")" class="btn btn-black pull-right"><i class="glyph-icon icon-linecons-tag" style="margin-right: 10px"></i>Back to Tickets</a></h2>
             <div class="row">
                 <div class="col-md-3">
                     <div class="sticky-nav">
@@ -62,6 +61,25 @@
                 <div class="col-md-9" style="margin-bottom: 600px">
                     <div class="panel panel-default">
                         <div class="panel-body">
+                            <div class="ribbon ribbon-tr">
+                                @if (Model.TicketPriority.Name == "Low")
+                                {
+                                    <div class="bg-blue-alt">@Model.TicketPriority.Name</div>
+                                }
+                                else if (Model.TicketPriority.Name == "Medium")
+                                {
+                                    <div class="bg-yellow">@Model.TicketPriority.Name</div>
+                                }
+                                else if (Model.TicketPriority.Name == "High")
+                                {
+                                    <div class="bg-orange">@Model.TicketPriority.Name</div>
+                                }
+                                else if (Model.TicketPriority.Name == "Critical")
+                                {
+                                    <div class="bg-red">@Model.TicketPriority.Name</div>
+                                }
+                            </div>
+
                             <div style="text-align: center">
                                 <center>
                                     <h1 style="margin-top: 30px; margin-bottom: -50px">
@@ -77,7 +95,7 @@
                             <div class="toc-tocify">
                                 <h2 class="mrg20B" style="padding-top: 100px">Details</h2>
                                 <div class="content-box pad20A">
-                                    <div class="ribbon ribbon-tr">
+                                    @*<div class="ribbon ribbon-tr">
                                         @if (Model.TicketPriority.Name == "Low")
                                         {
                                             <div class="bg-blue-alt">@Model.TicketPriority.Name</div>
@@ -94,7 +112,7 @@
                                         {
                                             <div class="bg-red">@Model.TicketPriority.Name</div>
                                         }
-                                    </div>
+                                    </div>*@
                                     <div class="row" style="margin-bottom: 20px; margin-top: 20px">
                                         <div class="col-md-6">
                                             <center>
@@ -126,7 +144,10 @@
                                                         else
                                                         {
                                                             <div class="divider"></div>
-                                                            <p><strong style="color: #00bca4">Not Yet Assigned</strong></p>
+                                                            <p>
+                                                                <strong style="color: #00bca4">Not Yet Assigned</strong><br /><br />
+                                                                <a href="@Url.Action("AssignDeveloper","Tickets", new { id = Model.Id })" class="btn btn-primary" style="color: white; text-decoration: none"><i class="glyph-icon icon-user" style="margin-right: 5px"></i> Assign</a>
+                                                            </p>
                                                         }
                                                     </div>
                                                 </div>
@@ -367,16 +388,370 @@
             </div>
         </div>
         <div class="tab-pane fade" id="history">
-            @foreach (var hist in Model.Histories)
-            {
-                <div>
-                    <p>@hist.Property</p>
-                    @if (hist.OldValue != null)
-                    {
-                        <p>@hist.OldValue</p>
-                    }
+            <h2 style="margin-bottom: 40px">Ticket History | <span style="color: #00bca4">#@Model.Id - @Model.Title</span><a href="@Url.Action("Index", "Home")" class="btn btn-black pull-right"><i class="glyph-icon icon-linecons-tag" style="margin-right: 10px"></i>Back to Tickets</a></h2>
+            <div class="panel">
+                <div class="panel-body">
+                    <h3 class="title-hero">
+                        Timeline
+                    </h3>
+                    <div class="example-box-wrapper">
+                        <div class="timeline-box">
+                            @{ 
+                                var counter = 0;
+                            }
+                            @foreach (var hist in Model.Histories.OrderByDescending(h => h.Id))
+                            {
+                                counter++;
+                                if (counter % 2 == 0)
+                                {
+                                    <div class="tl-row">
+                                        <div class="tl-item float-right">
+                                            @if (hist.Property.Contains("NEW"))
+                                            {
+                                                <div class="tl-icon" style="background-color: #00bca4; color: white">
+                                                    @if (hist.Property.Contains("COMMENT"))
+                                                    {
+                                                        <i class="glyph-icon icon-comment"></i>
+                                                    }
+                                                    else if (hist.Property.Contains("ATTACHMENT"))
+                                                    {
+                                                        <i class="glyph-icon icon-file"></i>
+                                                    }
+                                                    else if (hist.Property == "TITLE" || hist.Property == "DESCRIPTION" || hist.Property == "STATUS" || hist.Property == "PRIORITY" || hist.Property == "TYPE")
+                                                    {
+                                                        <i class="glyph-icon icon-tag"></i>
+                                                    }
+                                                    else if (hist.Property.Contains("PROJECT"))
+                                                    {
+                                                        <i class="glyph-icon icon-cog"></i>
+                                                    }
+                                                    else if (hist.Property.Contains("ASSIGNMENT"))
+                                                    {
+                                                        <i class="glyph-icon icon-user"></i>
+                                                    }
+                                                </div>
+                                            }
+                                            else if (hist.Property.Contains("DELETED") || hist.Property.Contains("REMOVED"))
+                                            {
+                                                <div class="tl-icon" style="background-color: #e74c3c; color: white">
+                                                    @if (hist.Property.Contains("COMMENT"))
+                                                    {
+                                                        <i class="glyph-icon icon-comment"></i>
+                                                    }
+                                                    else if (hist.Property.Contains("ATTACHMENT"))
+                                                    {
+                                                        <i class="glyph-icon icon-file"></i>
+                                                    }
+                                                    else if (hist.Property == "TITLE" || hist.Property == "DESCRIPTION" || hist.Property == "STATUS" || hist.Property == "PRIORITY" || hist.Property == "TYPE")
+                                                    {
+                                                        <i class="glyph-icon icon-tag"></i>
+                                                    }
+                                                    else if (hist.Property.Contains("PROJECT"))
+                                                    {
+                                                        <i class="glyph-icon icon-cog"></i>
+                                                    }
+                                                    else if (hist.Property.Contains("ASSIGNMENT"))
+                                                    {
+                                                        <i class="glyph-icon icon-user"></i>
+                                                    }
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="tl-icon" style="background-color: #8da0aa; color: white">
+                                                    @if (hist.Property.Contains("COMMENT"))
+                                                    {
+                                                        <i class="glyph-icon icon-comment"></i>
+                                                    }
+                                                    else if (hist.Property.Contains("ATTACHMENT"))
+                                                    {
+                                                        <i class="glyph-icon icon-file"></i>
+                                                    }
+                                                    else if (hist.Property == "TITLE" || hist.Property == "DESCRIPTION" || hist.Property == "STATUS" || hist.Property == "PRIORITY" || hist.Property == "TYPE")
+                                                    {
+                                                        <i class="glyph-icon icon-tag"></i>
+                                                    }
+                                                    else if (hist.Property.Contains("PROJECT"))
+                                                    {
+                                                        <i class="glyph-icon icon-cog"></i>
+                                                    }
+                                                    else if (hist.Property.Contains("ASSIGNMENT"))
+                                                    {
+                                                        <i class="glyph-icon icon-user"></i>
+                                                    }
+                                                </div>
+                                            }
+                                            <div class="tl-panel">
+                                                @hist.Created.ToString("M/dd/yyyy h:mm tt")
+                                            </div>
+                                            <div class="popover left pull-left" style="min-width: 275px">
+                                                <div class="arrow"></div>
+                                                <div class="popover-content">
+                                                    @if (hist.Property.Contains("NEW"))
+                                                    {
+                                                        <div class="tl-label bs-label label-success" style="background-color: #00bca4; white-space: pre-wrap">@hist.Property</div>
+                                                    }
+                                                    else if (hist.Property.Contains("DELETED") || hist.Property.Contains("REMOVED"))
+                                                    {
+                                                        <div class="tl-label bs-label label-success" style="background-color: #e74c3c; white-space: pre-wrap">@hist.Property</div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="tl-label bs-label label-success" style="background-color: #8da0aa; white-space: pre-wrap">@hist.Property</div>
+                                                    }                                                   
+                                                    @if (hist.Property == "TICKET CREATED")
+                                                    {
+                                                        <p class="tl-content">
+                                                            This ticket was created on this date at this time
+                                                        </p>
+                                                    }
+                                                    else if (hist.Property == "TITLE" || hist.Property == "DESCRIPTION" || hist.Property == "STATUS" || hist.Property == "PRIORITY" || hist.Property == "TYPE" || hist.Property == "PROJECT")
+                                                    {
+                                                        <p class="tl-content">
+                                                            Changed from "@hist.OldValue" to "@hist.NewValue"
+                                                        </p>
+                                                    }
+                                                    else if (hist.Property == "NEW ATTACHMENT")
+                                                    {
+                                                        <p class="tl-content">
+                                                            <a href="/TicketAttachments/@Model.Id/@hist.NewValue" target="_blank">@hist.NewValue</a>
+                                                        </p>
+                                                    }
+                                                    else if (hist.Property == "ATTACHMENT DELETED")
+                                                    {
+                                                        <p class="tl-content">
+                                                            @hist.NewValue
+                                                        </p>
+                                                    }
+                                                    else if (hist.Property == "NEW COMMENT")
+                                                    {
+                                                        <p class="tl-content">
+                                                            <em>"@hist.NewValue"</em>
+                                                        </p>
+                                                    }
+                                                    else if (hist.Property == "NEW ASSIGNMENT")
+                                                    {
+                                                        <p class="tl-content">
+                                                            Assigned to @hist.NewValue
+                                                        </p>
+                                                    }
+                                                    else if (hist.Property == "ASSIGNMENT CHANGE")
+                                                    {
+                                                        <p class="tl-content">
+                                                            Assigned to @hist.NewValue
+                                                            <br />
+                                                            <br />
+                                                            Previously assigned to @hist.OldValue
+                                                        </p>
+                                                    }
+                                                    else if (hist.Property == "ASSIGNMENT REMOVED (Developer removed from Project)")
+                                                    {
+                                                        <p class="tl-content">
+                                                            @hist.OldValue was removed as the assigned developer on this ticket because he/she was removed from the project
+                                                        </p>
+                                                    }
+                                                    else if (hist.Property == "ASSIGNMENT REMOVED (Developer not on ticket Project)")
+                                                    {
+                                                        <p class="tl-content">
+                                                            @hist.OldValue was removed as the assigned developer on this ticket because the ticket project changed and he/she was not part of the new project at this time
+                                                        </p>
+                                                    }
+                                                    else if (hist.Property == "ASSIGNMENT REMOVED (Developer no longer in role)")
+                                                    {
+                                                        <p class="tl-content">
+                                                            @hist.OldValue was removed as the assigned developer on this ticket because he/she lost their developer role
+                                                        </p>
+                                                    }
+                                                    <hr />
+                                                    <div class="tl-time" style="opacity: 1">
+                                                        <img class="img-circle" src="../../@hist.Author.ProfilePic" alt="Profile image" style="background-color: white; width: 35px; margin-right: 5px;">
+                                                        <span style="opacity: .4">@hist.Author.FullName</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="tl-row">
+                                        <div class="tl-item">
+                                            @if (hist.Property.Contains("NEW"))
+                                            {
+                                                <div class="tl-icon" style="background-color: #00bca4; color: white">
+                                                    @if (hist.Property.Contains("COMMENT"))
+                                                    {
+                                                        <i class="glyph-icon icon-comment"></i>
+                                                    }
+                                                    else if (hist.Property.Contains("ATTACHMENT"))
+                                                    {
+                                                        <i class="glyph-icon icon-file"></i>
+                                                    }
+                                                    else if (hist.Property == "TITLE" || hist.Property == "DESCRIPTION" || hist.Property == "STATUS" || hist.Property == "PRIORITY" || hist.Property == "TYPE")
+                                                    {
+                                                        <i class="glyph-icon icon-tag"></i>
+                                                    }
+                                                    else if (hist.Property.Contains("PROJECT"))
+                                                    {
+                                                        <i class="glyph-icon icon-cog"></i>
+                                                    }
+                                                    else if (hist.Property.Contains("ASSIGNMENT"))
+                                                    {
+                                                        <i class="glyph-icon icon-user"></i>
+                                                    }
+                                                </div>
+                                            }
+                                            else if (hist.Property.Contains("DELETED") || hist.Property.Contains("REMOVED"))
+                                            {
+                                                <div class="tl-icon" style="background-color: #e74c3c; color: white">
+                                                    @if (hist.Property.Contains("COMMENT"))
+                                                    {
+                                                        <i class="glyph-icon icon-comment"></i>
+                                                    }
+                                                    else if (hist.Property.Contains("ATTACHMENT"))
+                                                    {
+                                                        <i class="glyph-icon icon-file"></i>
+                                                    }
+                                                    else if (hist.Property == "TITLE" || hist.Property == "DESCRIPTION" || hist.Property == "STATUS" || hist.Property == "PRIORITY" || hist.Property == "TYPE")
+                                                    {
+                                                        <i class="glyph-icon icon-tag"></i>
+                                                    }
+                                                    else if (hist.Property.Contains("PROJECT"))
+                                                    {
+                                                        <i class="glyph-icon icon-cog"></i>
+                                                    }
+                                                    else if (hist.Property.Contains("ASSIGNMENT"))
+                                                    {
+                                                        <i class="glyph-icon icon-user"></i>
+                                                    }
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="tl-icon" style="background-color: #8da0aa; color: white">
+                                                    @if (hist.Property.Contains("COMMENT"))
+                                                    {
+                                                        <i class="glyph-icon icon-comment"></i>
+                                                    }
+                                                    else if (hist.Property.Contains("ATTACHMENT"))
+                                                    {
+                                                        <i class="glyph-icon icon-file"></i>
+                                                    }
+                                                    else if (hist.Property == "TITLE" || hist.Property == "DESCRIPTION" || hist.Property == "STATUS" || hist.Property == "PRIORITY" || hist.Property == "TYPE")
+                                                    {
+                                                        <i class="glyph-icon icon-tag"></i>
+                                                    }
+                                                    else if (hist.Property.Contains("PROJECT"))
+                                                    {
+                                                        <i class="glyph-icon icon-cog"></i>
+                                                    }
+                                                    else if (hist.Property.Contains("ASSIGNMENT"))
+                                                    {
+                                                        <i class="glyph-icon icon-user"></i>
+                                                    }
+                                                </div>
+                                            }
+                                            <div class="tl-panel">
+                                                @hist.Created.ToString("M/dd/yyyy h:mm tt")
+                                            </div>
+                                            <div class="popover right pull-right" style="margin-right: 35px; min-width: 275px">
+                                                <div class="arrow"></div>
+                                                <div class="popover-content">
+                                                    @if (hist.Property.Contains("NEW"))
+                                                    {
+                                                        <div class="tl-label bs-label label-success" style="background-color: #00bca4; white-space: pre-wrap">@hist.Property</div>
+                                                    }
+                                                    else if (hist.Property.Contains("DELETED") || hist.Property.Contains("REMOVED"))
+                                                    {
+                                                        <div class="tl-label bs-label label-success" style="background-color: #e74c3c; white-space: pre-wrap">@hist.Property</div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="tl-label bs-label label-success" style="background-color: #8da0aa; white-space: pre-wrap">@hist.Property</div>
+                                                    }
+                                                    @if (hist.Property == "TICKET CREATED")
+                                                    {
+                                                        <p class="tl-content">
+                                                            This ticket was created on this date at this time
+                                                        </p>
+                                                    }
+                                                    else if (hist.Property == "TITLE" || hist.Property == "DESCRIPTION" || hist.Property == "STATUS" || hist.Property == "PRIORITY" || hist.Property == "TYPE" || hist.Property == "PROJECT")
+                                                    {
+                                                        <p class="tl-content">
+                                                            Changed from "@hist.OldValue" to "@hist.NewValue"
+                                                        </p>
+                                                    }
+                                                    else if (hist.Property == "NEW ATTACHMENT")
+                                                    {
+                                                        <p class="tl-content">
+                                                            <a href="/TicketAttachments/@Model.Id/@hist.NewValue" target="_blank">@hist.NewValue</a>
+                                                        </p>
+                                                    }
+                                                    else if (hist.Property == "ATTACHMENT DELETED")
+                                                    {
+                                                        <p class="tl-content">
+                                                            @hist.NewValue
+                                                        </p>
+                                                    }
+                                                    else if (hist.Property == "NEW COMMENT")
+                                                    {
+                                                        <p class="tl-content">
+                                                            <em>"@hist.NewValue"</em>
+                                                        </p>
+                                                    }
+                                                    else if (hist.Property == "NEW ASSIGNMENT")
+                                                    {
+                                                        <p class="tl-content">
+                                                            Assigned to @hist.NewValue
+                                                        </p>
+                                                    }
+                                                    else if (hist.Property == "ASSIGNMENT CHANGE")
+                                                    {
+                                                        <p class="tl-content">
+                                                            Assigned to @hist.NewValue
+                                                            <br />
+                                                            <br />
+                                                            Previously assigned to @hist.OldValue
+                                                        </p>
+                                                    }
+                                                    else if (hist.Property == "ASSIGNMENT REMOVED (Developer removed from Project)")
+                                                    {
+                                                        <p class="tl-content">
+                                                            @hist.OldValue was removed as the assigned developer on this ticket because he/she was removed from the project
+                                                        </p>
+                                                    }
+                                                    else if (hist.Property == "ASSIGNMENT REMOVED (Developer not on ticket Project)")
+                                                    {
+                                                        <p class="tl-content">
+                                                            @hist.OldValue was removed as the assigned developer on this ticket because the ticket project changed and he/she was not part of the new project at this time
+                                                        </p>
+                                                    }
+                                                    else if (hist.Property == "ASSIGNMENT REMOVED (Developer no longer in role)")
+                                                    {
+                                                        <p class="tl-content">
+                                                            @hist.OldValue was removed as the assigned developer on this ticket because he/she lost their developer role
+                                                        </p>
+                                                    }
+                                                    <hr />
+                                                    <div class="tl-time" style="opacity: 1; margin-top: 10px">
+                                                        <img class="img-circle" src="../../@hist.Author.ProfilePic" alt="Profile image" style="background-color: white; width: 35px; margin-right: 5px;">
+                                                        <span style="opacity: .4">@hist.Author.FullName</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }                                           
+                        </div>
+                        <center>
+                            <div style="margin-top: 40px; margin-bottom: 40px">
+                                <a href="javascript:;" id="scrollToTop" class="btn btn-primary" style="color: white; text-decoration: none"><i class="glyph-icon icon-arrow-up" style="margin-right: 15px"></i> Back to the Top <i class="glyph-icon icon-arrow-up" style="margin-left: 15px"></i></a>
+                            </div>
+                        </center>  
+                    </div>
                 </div>
-            }        
+            </div>
         </div>
     </div>
 </div>
@@ -413,5 +788,21 @@
             window.location.hash = "#TicketAttachments";
             window.location.reload(true);
         };
+    </script>
+    <script>
+            /*============================================
+            ScrollTo Links
+            ==============================================*/
+
+            $(function () {
+                $('#scrollToBottom').bind("click", function () {
+                    $('html, body').animate({ scrollTop: $(document).height() });
+                    return false;
+                });
+                $('#scrollToTop').bind("click", function () {
+                    $('html, body').animate({ scrollTop: 0 });
+                    return false;
+                });
+            });
     </script>
 }
