@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNet.Identity;
+﻿using BugTrackerPro.Models.CodeFirst;
+using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,9 @@ namespace BugTrackerPro.Models
                 ViewBag.FullName = user.FullName;
                 ViewBag.ProfilePic = user.ProfilePic;
 
-                if (User.IsInRole("Admin") || User.IsInRole("Project Manager"))
+                var tickets = new List<Ticket>();
+
+                if (User.IsInRole("Admin"))
                 {
                     ViewBag.MyProjects = db.Projects.OrderBy(p => p.Title).ToList();
                 }
@@ -30,7 +33,36 @@ namespace BugTrackerPro.Models
                 {
                     ViewBag.MyProjects = user.Projects.OrderBy(p => p.Title).ToList();
                 }
+
+                if (User.IsInRole("Admin"))
+                {
+                    tickets = db.Tickets.ToList();
+                }
+                else if (User.IsInRole("Project Manager"))
+                {
+                    tickets = user.Projects.SelectMany(p => p.Tickets).ToList();
+                }
+                else if (User.IsInRole("Developer"))
+                {
+                    tickets = db.Tickets.Where(t => t.AssignToUserId == user.Id).ToList();
+                }
+                else if (User.IsInRole("Submitter"))
+                {
+                    tickets = db.Tickets.Where(t => t.OwnerUserId == user.Id).ToList();
+                }
+
+                ViewBag.MyTickets = tickets;
+
+                if (tickets.Count > 0)
+                {
+                    ViewBag.TicketCompletion = Convert.ToInt32(100 * (Convert.ToDecimal(tickets.Where(t => t.TicketStatusId == 4).Count()) / Convert.ToDecimal(tickets.Count())));
+                }
+                else
+                {
+                    ViewBag.TicketCompletion = 0;
+                }
             }
+
             base.OnActionExecuted(filterContext);
         }
     }

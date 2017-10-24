@@ -272,15 +272,42 @@
                 </div>
             </div>
         </div>*@
+        @{//TODO:BOOKMARK
+
+        }
         <div class="sb-slidebar bg-black sb-left sb-style-overlay">
             <div class="scrollable-content scrollable-slim-sidebar">
                 <div class="pad15A">
                     <a href="#" title="" data-toggle="collapse" data-target="#sidebar-toggle-1" class="popover-title">
-                        Cloud status
+                        My Stuff
                     </a>
                     <div id="sidebar-toggle-1" class="collapse in">
                         <div class="pad15A container">
-                            <div class="row">
+                            <div class="row mrg20B">
+                                <div class="col-md-6">
+                                    <a href="#" title="Example tile shortcut" class="tile-box tile-box-shortcut btn-primary">
+                                        <span class="bs-badge badge-absolute">@ViewBag.MyProjects.Count</span>
+                                        <div class="tile-header">
+                                            My Projects
+                                        </div>
+                                        <div class="tile-content-wrapper">
+                                            <i class="glyph-icon icon-cog"></i>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-md-6">
+                                    <a href="#" title="Example tile shortcut" class="tile-box tile-box-shortcut btn-primary">
+                                        <span class="bs-badge badge-absolute">@ViewBag.MyTickets.Count</span>
+                                        <div class="tile-header">
+                                            My Tickets
+                                        </div>
+                                        <div class="tile-content-wrapper">
+                                            <i class="glyph-icon icon-tag"></i>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            @*<div class="row">
                                 <div class="col-md-4">
                                     <div class="text-center font-gray pad5B text-transform-upr font-size-12">New visits</div>
                                     <div class="chart-alt-3 font-gray-dark" data-percent="55"><span>55</span>%</div>
@@ -293,19 +320,28 @@
                                     <div class="text-center font-gray pad5B text-transform-upr font-size-12">Server load</div>
                                     <div class="chart-alt-3 font-gray-dark" data-percent="92"><span>92</span>%</div>
                                 </div>
-                            </div>
+                            </div>*@
                             <div class="divider mrg15T mrg15B"></div>
-                            <div class="text-center">
-                                <a href="#" class="btn center-div btn-info mrg5T btn-sm text-transform-upr updateEasyPieChart">
-                                    <i class="glyph-icon icon-refresh"></i>
-                                    Update charts
-                                </a>
+                            <div>
+                                <ul class="progress-box">
+                                    <li>
+                                        <b class="pull-right">@ViewBag.TicketCompletion%</b>
+                                        <div class="progress-title">
+                                            Ticket Completion
+                                        </div>
+                                        <div class="progressbar-smaller progressbar" data-value="@ViewBag.TicketCompletion">
+                                            <div class="progressbar-value bg-primary">
+                                                <div class="progressbar-overlay"></div>
+                                            </div>
+                                        </div>
+                                    </li>                                    
+                                </ul>                   
                             </div>
                         </div>
                     </div>
                     <div class="clear"></div>
                     <a href="#" title="" data-toggle="collapse" data-target="#sidebar-toggle-6" class="popover-title">
-                        Latest transfers
+                        Latest attachments
                     </a>
                     <div id="sidebar-toggle-6" class="collapse in">
                         <ul class="files-box">
@@ -387,6 +423,47 @@
                         </ul>
                     </div>
                     <div class="clear"></div>
+                    <a href="#" title="" data-toggle="collapse" data-target="#sidebar-toggle-4" class="popover-title">
+                        Latest comments
+                    </a>
+                    <div id="sidebar-toggle-4" class="collapse in">
+                        <ul class="notifications-box notifications-box-alt">
+                            <li>
+                                <span class="bg-purple icon-notification glyph-icon icon-users"></span>
+                                <span class="notification-text">This is an error notification</span>
+                                <div class="notification-time">
+                                    a few seconds ago
+                                    <span class="glyph-icon icon-clock-o"></span>
+                                </div>
+                                <a href="#" class="notification-btn btn btn-xs btn-black tooltip-button" data-placement="left" title="View details">
+                                    <i class="glyph-icon icon-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <span class="bg-warning icon-notification glyph-icon icon-ticket"></span>
+                                <span class="notification-text">This is a warning notification</span>
+                                <div class="notification-time">
+                                    <b>15</b> minutes ago
+                                    <span class="glyph-icon icon-clock-o"></span>
+                                </div>
+                                <a href="#" class="notification-btn btn btn-xs btn-black tooltip-button" data-placement="left" title="View details">
+                                    <i class="glyph-icon icon-arrow-right"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <span class="bg-green icon-notification glyph-icon icon-random"></span>
+                                <span class="notification-text font-green">A success message example.</span>
+                                <div class="notification-time">
+                                    <b>2 hours</b> ago
+                                    <span class="glyph-icon icon-clock-o"></span>
+                                </div>
+                                <a href="#" class="notification-btn btn btn-xs btn-black tooltip-button" data-placement="left" title="View details">
+                                    <i class="glyph-icon icon-arrow-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    @*<div class="clear"></div>
                     <a href="#" title="" data-toggle="collapse" data-target="#sidebar-toggle-3" class="popover-title">
                         Tasks for today
                     </a>
@@ -434,49 +511,7 @@
                                 </div>
                             </li>
                         </ul>
-                    </div>
-                    <div class="clear"></div>
-                    <a href="#" title="" data-toggle="collapse" data-target="#sidebar-toggle-4" class="popover-title">
-                        Pending notifications
-                        <span class="bs-label bg-orange tooltip-button" title="Label example">New</span>
-                    </a>
-                    <div id="sidebar-toggle-4" class="collapse in">
-                        <ul class="notifications-box notifications-box-alt">
-                            <li>
-                                <span class="bg-purple icon-notification glyph-icon icon-users"></span>
-                                <span class="notification-text">This is an error notification</span>
-                                <div class="notification-time">
-                                    a few seconds ago
-                                    <span class="glyph-icon icon-clock-o"></span>
-                                </div>
-                                <a href="#" class="notification-btn btn btn-xs btn-black tooltip-button" data-placement="left" title="View details">
-                                    <i class="glyph-icon icon-arrow-right"></i>
-                                </a>
-                            </li>
-                            <li>
-                                <span class="bg-warning icon-notification glyph-icon icon-ticket"></span>
-                                <span class="notification-text">This is a warning notification</span>
-                                <div class="notification-time">
-                                    <b>15</b> minutes ago
-                                    <span class="glyph-icon icon-clock-o"></span>
-                                </div>
-                                <a href="#" class="notification-btn btn btn-xs btn-black tooltip-button" data-placement="left" title="View details">
-                                    <i class="glyph-icon icon-arrow-right"></i>
-                                </a>
-                            </li>
-                            <li>
-                                <span class="bg-green icon-notification glyph-icon icon-random"></span>
-                                <span class="notification-text font-green">A success message example.</span>
-                                <div class="notification-time">
-                                    <b>2 hours</b> ago
-                                    <span class="glyph-icon icon-clock-o"></span>
-                                </div>
-                                <a href="#" class="notification-btn btn btn-xs btn-black tooltip-button" data-placement="left" title="View details">
-                                    <i class="glyph-icon icon-arrow-right"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+                    </div>*@                 
                 </div>
             </div>
         </div>
@@ -640,7 +675,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="dropdown" id="progress-btn">
+                    @*<div class="dropdown" id="progress-btn">
                         <a data-toggle="dropdown" href="#" title="">
                             <span class="small-badge bg-azure"></span>
                             <i class="glyph-icon icon-linecons-params"></i>
@@ -740,14 +775,14 @@
                                 </a>
                             </div>
                         </div>
-                    </div>
+                    </div>*@
                     <div class="dropdown" id="cloud-btn">
                         <a href="#" data-placement="bottom" class="tooltip-button sb-toggle-left" title="Statistics Sidebar">
                             <i class="glyph-icon icon-linecons-cloud"></i>
                         </a>
                     </div>
                     <div class="dropdown" id="dashnav-btn">
-                        <a href="#" data-toggle="dropdown" data-placement="left" class="popover-button-header tooltip-button" title="My Projects Shortcut">
+                        <a href="#" data-toggle="dropdown" data-placement="bottom" class="popover-button-header tooltip-button" title="My Projects Shortcut">
                             <i class="glyph-icon icon-linecons-cog"></i>
                         </a>
                         <div class="dropdown-menu float-right">
@@ -759,7 +794,7 @@
                                             <span class="glyph-icon icon-separator-vertical pad0A medium">
                                                 <i class="glyph-icon icon-cog opacity-80 font-size-20"></i>
                                             </span>
-                                            <div style="max-width: 93px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-all; word-break: break-word; display: inline-block;"><span style="max-width: 93px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-all; word-break: break-word; display: inline-block;">@project.Title</span></div>                     
+                                            <div style="white-space: pre-wrap"><span style="white-space: pre-wrap">@project.Title</span></div>                     
                                         </a>
                                     }  
                                 </div>
@@ -1060,7 +1095,6 @@
         <script type="text/javascript" src="../../assets/themes/admin/layout.js"></script>
         <!-- Theme switcher -->
         <script type="text/javascript" src="../../assets/widgets/theme-switcher/themeswitcher.js"></script>
-
         <!-- Data tables -->
         <script type="text/javascript" src="../../assets/widgets/datatable/datatable.js"></script>
         <script type="text/javascript" src="../../assets/widgets/datatable/datatable-bootstrap.js"></script>

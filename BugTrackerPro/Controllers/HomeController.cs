@@ -26,7 +26,7 @@ namespace BugTrackerPro.Controllers
                 }
                 else
                 {
-                    model.Tickets = db.Tickets.Where(t => t.Project.Users.Any(u => u.Id == user.Id)).OrderByDescending(t => t.Id).ToList();
+                    model.Tickets = user.Projects.SelectMany(p => p.Tickets).OrderByDescending(t => t.Id).ToList();
                 }
             }
             else if (User.IsInRole("Developer") || User.IsInRole("Submitter"))

@@ -29,12 +29,16 @@ namespace BugTrackerPro.Models
             Histories = new HashSet<TicketHistory>();
             Comments = new HashSet<TicketComment>();
             Attachments = new HashSet<TicketAttachment>();
+            //SubmittedTickets = new HashSet<Ticket>();
+            //AssignedTickets = new HashSet<Ticket>();
         }
 
         public virtual ICollection<Project> Projects { get; set; }
         public virtual ICollection<TicketHistory> Histories { get; set; }
         public virtual ICollection<TicketComment> Comments { get; set; }
         public virtual ICollection<TicketAttachment> Attachments { get; set; }
+        //public virtual ICollection<Ticket> SubmittedTickets { get; set; }
+        //public virtual ICollection<Ticket> AssignedTickets { get; set; }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
@@ -66,5 +70,20 @@ namespace BugTrackerPro.Models
         public DbSet<TicketPriority> TicketPriorities { get; set; }
         public DbSet<TicketStatus> TicketStatuses { get; set; }
         public DbSet<TicketType> TicketTypes { get; set; }
+
+        //protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        //{
+        //    modelBuilder.Entity<Ticket>()
+        //                .HasRequired(t => t.OwnerUser)
+        //                .WithMany(t => t.SubmittedTickets)
+        //                .HasForeignKey(t => t.OwnerUserId)
+        //                .WillCascadeOnDelete(false);
+
+        //    modelBuilder.Entity<Ticket>()
+        //                .HasRequired(t => t.AssignToUser)
+        //                .WithMany(t => t.AssignedTickets)
+        //                .HasForeignKey(t => t.AssignToUserId)
+        //                .WillCascadeOnDelete(false);
+        //}
     }
 }

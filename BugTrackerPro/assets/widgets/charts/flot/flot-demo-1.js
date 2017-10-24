@@ -100,42 +100,42 @@ $(function() {
 
     var updateInterval = 30;
 
-    var plot = $.plot("#data-example-3", [ getRandomData() ], {
+    //var plot = $.plot("#data-example-3", [ getRandomData() ], {
 
-        series: {
-            lines: {
-                show: true,
-                lineWidth: 2,
-                fill: 0.5,
-                fillColor: { colors: [ { opacity: 0.01 }, { opacity: 0.08 } ] }
-            },
-            shadowSize: 0   // Drawing is faster without shadows
-        },
-        grid: {
-            labelMargin: 10,
-            hoverable: true,
-            clickable: true,
-            borderWidth: 1,
-            borderColor: 'rgba(82, 167, 224, 0.06)'
-        },
-        yaxis: {
-            min: 0,
-            max: 120,
-            tickColor: 'rgba(0, 0, 0, 0.06)', font: {color: 'rgba(0, 0, 0, 0.4)'}},
-        xaxis: { show: false },
-        colors: [getUIColor('default'),getUIColor('gray')]
-    });
+    //    series: {
+    //        lines: {
+    //            show: true,
+    //            lineWidth: 2,
+    //            fill: 0.5,
+    //            fillColor: { colors: [ { opacity: 0.01 }, { opacity: 0.08 } ] }
+    //        },
+    //        shadowSize: 0   // Drawing is faster without shadows
+    //    },
+    //    grid: {
+    //        labelMargin: 10,
+    //        hoverable: true,
+    //        clickable: true,
+    //        borderWidth: 1,
+    //        borderColor: 'rgba(82, 167, 224, 0.06)'
+    //    },
+    //    yaxis: {
+    //        min: 0,
+    //        max: 120,
+    //        tickColor: 'rgba(0, 0, 0, 0.06)', font: {color: 'rgba(0, 0, 0, 0.4)'}},
+    //    xaxis: { show: false },
+    //    colors: [getUIColor('default'),getUIColor('gray')]
+    //});
 
-    function update() {
+    //function update() {
 
-        plot.setData([getRandomData()]);
+    //    plot.setData([getRandomData()]);
 
-        // Since the axes don't change, we don't need to call plot.setupGrid()
+    //    // Since the axes don't change, we don't need to call plot.setupGrid()
 
-        plot.draw();
-        setTimeout(update, updateInterval);
-    }
+    //    plot.draw();
+    //    setTimeout(update, updateInterval);
+    //}
 
-    update();
+    //update();
 
 });

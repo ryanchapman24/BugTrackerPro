@@ -39,6 +39,9 @@ namespace BugTrackerPro.Controllers
         [Authorize]
         public ActionResult Details(int? id)
         {
+            var user = db.Users.Find(User.Identity.GetUserId());
+            ProjectAssignmentsHelper helper = new ProjectAssignmentsHelper();
+
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -47,6 +50,10 @@ namespace BugTrackerPro.Controllers
             if (project == null)
             {
                 return HttpNotFound();
+            }
+            if (!User.IsInRole("Admin") && helper.IsUserOnProject(user.Id, project.Id) == false)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             return View(project);
         }
@@ -88,6 +95,9 @@ namespace BugTrackerPro.Controllers
         [Authorize(Roles = "Admin,Project Manager")]
         public ActionResult Edit(int? id)
         {
+            var user = db.Users.Find(User.Identity.GetUserId());
+            ProjectAssignmentsHelper helper = new ProjectAssignmentsHelper();
+
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
@@ -96,6 +106,10 @@ namespace BugTrackerPro.Controllers
             if (project == null)
             {
                 return HttpNotFound();
+            }
+            if (!User.IsInRole("Admin") && helper.IsUserOnProject(user.Id, project.Id) == false)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             return View(project);
         }
@@ -122,8 +136,13 @@ namespace BugTrackerPro.Controllers
         [Authorize(Roles = "Admin, Project Manager")]
         public ActionResult EditProjectAssignments(int id)
         {
+            var user = db.Users.Find(User.Identity.GetUserId());
             var project = db.Projects.Find(id);
-            var helper = new ProjectAssignmentsHelper();
+            ProjectAssignmentsHelper helper = new ProjectAssignmentsHelper();
+            if (!User.IsInRole("Admin") && helper.IsUserOnProject(user.Id, project.Id) == false)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
             var model = new ProjectUserViewModels();
             model.Project = project;
             model.SelectedUsers = helper.ListUsersOnProject(id).OrderBy(u => u.FirstName).Select(u => u.Id).ToArray();

@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<BugTrackerPro.Models.CodeFirst.Project>
+@using Microsoft.AspNet.Identity;
 
 @{
     ViewBag.Title = "Index";
@@ -38,9 +39,12 @@
                         <th>
                             Assigned Users
                         </th>
-                        <th>
-                            Ticket Count
-                        </th>
+                        @if (User.IsInRole("Admin") || User.IsInRole("Project Manager") || User.IsInRole("Developer"))
+                        {
+                            <th>
+                                Open Tickets
+                            </th>
+                        }           
                         <th>
                             Action
                         </th>
@@ -58,7 +62,7 @@
                             Assigned Users
                         </th>
                         <th>
-                            Ticket Count
+                            Open Tickets
                         </th>
                         <th>
                             Action
@@ -83,14 +87,26 @@
                                     <p class="text-no-wrap">@user.FullName</p>
                                 }
                             </td>
+                            @if (User.IsInRole("Admin") || User.IsInRole("Project Manager") || User.IsInRole("Developer"))
+                            {
+                                <td>
+                                    @item.Tickets.Where(t => t.TicketStatusId != 4).Count()
+                                </td>
+                            }
                             <td>
-                                @item.Tickets.Count
-                            </td>
-                            <td>
-                                @Html.ActionLink("Users", "EditProjectAssignments", new { id = item.Id })<br />
-                                @Html.ActionLink("Details", "Details", new { id = item.Id })<br />
-                                @Html.ActionLink("Edit", "Edit", new { id = item.Id })<br />
-                                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                                @if (User.IsInRole("Admin") || (User.IsInRole("Project Manager") && item.Users.Any(p => p.Id == User.Identity.GetUserId())))
+                                {
+                                    @Html.ActionLink("Users", "EditProjectAssignments", new { id = item.Id })<br />
+                                    @Html.ActionLink("Edit", "Edit", new { id = item.Id })<br />
+                                }
+                                @if (User.IsInRole("Admin") || item.Users.Any(p => p.Id == User.Identity.GetUserId()))
+                                {
+                                    @Html.ActionLink("Details", "Details", new { id = item.Id })<br />
+                                }
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                                }
                             </td>
                         </tr>
                     }

@@ -22,7 +22,7 @@
 <div class="sb-slidebar bg-black sb-right sb-style-overlay">
     <div class="scrollable-content scrollable-slim-sidebar">
         <div class="pad10A" style="margin-top: 100px">
-            <div class="divider-header" style="color: #00a792; opacity: 1; font-size: 20px">Project Users <span style="color: white">(@Model.Users.Count)</span></div>
+            <div class="divider-header" style="color: #00a792; opacity: 1; font-size: 20px">Project Team <span style="color: white">(@Model.Users.Count)</span></div>
             <hr style="border-color: white; margin-bottom: 30px"/>
             <ul class="chat-box">
                 @foreach (var member in Model.Users.OrderBy(u => u.FullName))
@@ -112,7 +112,7 @@
     </ul>
     <hr />
     <ul class="list-group list-group-separator row list-group-icons">
-        @if (User.IsInRole("Admin") || User.IsInRole("Project Manager") || User.IsInRole("Developer"))
+        @if (User.IsInRole("Admin") || User.IsInRole("Project Manager"))
         {
             <li class="col-md-8 col-sm-12">
                 <div class="panel" style="min-height: 262px">
@@ -371,10 +371,10 @@
         $(function () {
             // Randomly Generated Data
             @{ 
-                var complete = Model.Tickets.Where(t => t.TicketStatus.Name == "Complete").Count();
-                var inProgress = Model.Tickets.Where(t => t.TicketStatus.Name == "In Progress").Count();
-                var assigned = Model.Tickets.Where(t => t.TicketStatus.Name == "Assigned").Count();
-                var unassigned = Model.Tickets.Where(t => t.TicketStatus.Name == "Unassigned").Count();
+                var complete = tickets.Where(t => t.TicketStatus.Name == "Complete").Count();
+                var inProgress = tickets.Where(t => t.TicketStatus.Name == "In Progress").Count();
+                var assigned = tickets.Where(t => t.TicketStatus.Name == "Assigned").Count();
+                var unassigned = tickets.Where(t => t.TicketStatus.Name == "Unassigned").Count();
 
             }
             var dataSet = [
