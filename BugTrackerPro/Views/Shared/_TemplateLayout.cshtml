@@ -275,7 +275,7 @@
         @{//TODO:BOOKMARK
 
         }
-        <div class="sb-slidebar bg-black sb-left sb-style-overlay">
+        <div class="sb-slidebar bg-black sb-left sb-style-overlay" id="testingtesting">
             <div class="scrollable-content scrollable-slim-sidebar">
                 <div class="pad15A">
                     <a href="#" title="" data-toggle="collapse" data-target="#sidebar-toggle-1" class="popover-title">
@@ -323,16 +323,31 @@
                             </div>*@
                             <div class="divider mrg15T mrg15B"></div>
                             <div>
-                                <ul class="progress-box">
+                                <ul class="progress-box" id="myTestProgressBar">
                                     <li>
                                         <b class="pull-right">@ViewBag.TicketCompletion%</b>
-                                        <div class="progress-title">
+                                        <div class="progress-title" style="color: white">
                                             Ticket Completion
                                         </div>
                                         <div class="progressbar-smaller progressbar" data-value="@ViewBag.TicketCompletion">
-                                            <div class="progressbar-value bg-primary">
-                                                <div class="progressbar-overlay"></div>
-                                            </div>
+                                            @if (ViewBag.TicketCompletion >= 70)
+                                            {
+                                                <div class="progressbar-value bg-primary">
+                                                    <div class="progressbar-overlay"></div>
+                                                </div>
+                                            }
+                                            else if (ViewBag.TicketCompletion >= 30 && ViewBag.TicketCompletion <= 69)
+                                            {
+                                                <div class="progressbar-value bg-info">
+                                                    <div class="progressbar-overlay"></div>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="progressbar-value bg-red">
+                                                    <div class="progressbar-overlay"></div>
+                                                </div>
+                                            }
                                         </div>
                                     </li>                                    
                                 </ul>                   
@@ -778,7 +793,7 @@
                     </div>*@
                     <div class="dropdown" id="cloud-btn">
                         <a href="#" data-placement="bottom" class="tooltip-button sb-toggle-left" title="Statistics Sidebar">
-                            <i class="glyph-icon icon-linecons-cloud"></i>
+                            <i class="glyph-icon icon-linecons-params"></i>
                         </a>
                     </div>
                     <div class="dropdown" id="dashnav-btn">
