@@ -14,6 +14,7 @@ namespace BugTrackerPro.Models
 
         protected override void OnActionExecuted(ActionExecutedContext filterContext)
         {
+            
             if (User.Identity.IsAuthenticated)
             {
                 var user = db.Users.Find(User.Identity.GetUserId());

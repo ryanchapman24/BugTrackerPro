@@ -11,9 +11,19 @@ using BugTrackerPro.Models.CodeFirst;
 using Microsoft.AspNet.Identity;
 using BugTrackerPro.Models.Helpers;
 using System.IO;
+using Newtonsoft.Json;
 
 namespace BugTrackerPro.Controllers
 {
+    public class CreatedComment
+    {
+        public int Id { get; set; }
+        public string Body { get; set; }
+        public string Created { get; set; }
+        public string FullName { get; set; }
+        public string ProfilePic { get; set; }
+    }
+
     [Authorize]
     public class TicketsController : Universal
     {
@@ -31,12 +41,18 @@ namespace BugTrackerPro.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+            var user = db.Users.Find(User.Identity.GetUserId());
+            ProjectAssignmentsHelper helper = new ProjectAssignmentsHelper();
             Ticket ticket = db.Tickets.Find(id);
             if (ticket == null)
             {
                 return HttpNotFound();
             }
-            return View(ticket);
+            if (User.IsInRole("Admin") || (User.IsInRole("Project Manager") && helper.IsUserOnProject(user.Id, ticket.ProjectId) == true) || (User.IsInRole("Developer") && ticket.AssignToUserId == user.Id) || (User.IsInRole("Submitter") && ticket.OwnerUserId == user.Id))
+            {
+                return View(ticket);
+            }
+            return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
         }
 
         // GET: Tickets/Create
@@ -453,34 +469,156 @@ namespace BugTrackerPro.Controllers
         // POST: Tickets/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult AddComment(string body, int ticketId)
+        //{
+        //    var user = db.Users.Find(User.Identity.GetUserId());
+        //    var oldTicket = db.Tickets.AsNoTracking().First(t => t.Id == ticketId);
+
+        //    if (body != null)
+        //    {              
+        //        TicketComment comment = new TicketComment();
+        //        comment.Created = DateTime.Now;
+        //        comment.AuthorId = User.Identity.GetUserId();
+        //        comment.TicketId = ticketId;
+        //        comment.Body = body;
+        //        db.TicketComments.Add(comment);
+        //        db.SaveChanges();
+
+        //        TicketHistory th = new TicketHistory();
+        //        th.Property = "NEW COMMENT";
+        //        th.AuthorId = user.Id;
+        //        th.TicketId = ticketId;
+        //        th.Created = DateTime.Now;
+        //        th.NewValue = comment.Body;
+        //        db.TicketHistories.Add(th);
+        //        db.SaveChanges();
+        //    }
+
+        //    return Redirect(Url.Action("Details", "Tickets", new { id = ticketId }) + "#Comments");
+        //}
+
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult AddComment(string body, int ticketId)
+        public ActionResult AddComment(int ticketId, string body)
         {
             var user = db.Users.Find(User.Identity.GetUserId());
             var oldTicket = db.Tickets.AsNoTracking().First(t => t.Id == ticketId);
 
-            if (body != null)
-            {              
-                TicketComment comment = new TicketComment();
-                comment.Created = DateTime.Now;
-                comment.AuthorId = User.Identity.GetUserId();
-                comment.TicketId = ticketId;
-                comment.Body = body;
-                db.TicketComments.Add(comment);
-                db.SaveChanges();
+            TicketComment comment = new TicketComment();
+            comment.Created = DateTime.Now;
+            comment.AuthorId = User.Identity.GetUserId();
+            comment.TicketId = ticketId;
+            comment.Body = body;
+            db.TicketComments.Add(comment);
+            db.SaveChanges();
 
-                TicketHistory th = new TicketHistory();
-                th.Property = "NEW COMMENT";
-                th.AuthorId = user.Id;
-                th.TicketId = ticketId;
-                th.Created = DateTime.Now;
-                th.NewValue = comment.Body;
-                db.TicketHistories.Add(th);
+            TicketHistory th = new TicketHistory();
+            th.Property = "NEW COMMENT";
+            th.AuthorId = user.Id;
+            th.TicketId = ticketId;
+            th.Created = DateTime.Now;
+            th.NewValue = comment.Body;
+            db.TicketHistories.Add(th);
+            db.SaveChanges();
+
+            //Simulated comment for Ajax with relational properties
+            CreatedComment createdComment = new CreatedComment();
+            createdComment.Id = comment.Id;
+            createdComment.Body = comment.Body;
+            createdComment.Created = comment.Created.ToString("MM/dd/yyyy") + " at " + comment.Created.ToString("h:mm tt");
+            createdComment.FullName = user.FullName;
+            createdComment.ProfilePic = user.ProfilePic;
+
+            return Content(JsonConvert.SerializeObject(createdComment), "application/json");
+        }
+
+        // POST: Tickets/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult EditComment(int commentId, string body)
+        //{
+        //    var user = db.Users.Find(User.Identity.GetUserId());
+        //    TicketComment comment = db.TicketComments.Find(commentId);
+        //    var oldTicket = db.Tickets.AsNoTracking().First(t => t.Id == comment.TicketId);
+
+        //    if (body != null)
+        //    {
+        //        comment.Body = body;
+        //        db.TicketComments.Attach(comment);
+        //        db.Entry(comment).Property("Body").IsModified = true;
+        //        db.SaveChanges();
+        //    }
+        //    return Redirect(Url.Action("Details", "Tickets", new { id = comment.TicketId }) + "#Comments");
+        //}
+
+        [HttpPost]
+        public ActionResult EditComment(int commentId, string body)
+        {
+            var user = db.Users.Find(User.Identity.GetUserId());
+            TicketComment comment = db.TicketComments.Find(commentId);
+            if (comment != null)
+            {
+                var oldTicket = db.Tickets.AsNoTracking().First(t => t.Id == comment.TicketId);
+
+                if (comment.Body != body)
+                {
+                    TicketHistory th = new TicketHistory();
+                    th.Property = "COMMENT EDITED";
+                    th.AuthorId = user.Id;
+                    th.TicketId = oldTicket.Id;
+                    th.Created = DateTime.Now;
+                    th.OldValue = comment.Body;
+                    th.NewValue = body;
+                    db.TicketHistories.Add(th);
+                }
+
+                comment.Body = body;
+                comment.Updated = DateTime.Now;
+                db.TicketComments.Attach(comment);
+                db.Entry(comment).Property("Body").IsModified = true;
+                db.Entry(comment).Property("Updated").IsModified = true;
                 db.SaveChanges();
             }
 
-            return Redirect(Url.Action("Details", "Tickets", new { id = ticketId }) + "#Comments");
+            //Had to do this because Serializing the comment was a problem.
+            //Comment had an Author that had comments that all had authors (endless loop)
+            TicketComment editedComment = new TicketComment();
+            editedComment.Id = commentId;
+            editedComment.Body = body;
+
+            return Content(JsonConvert.SerializeObject(editedComment), "application/json");
+        }
+
+        [HttpPost]
+        public ActionResult DeleteComment(int commentId)
+        {
+            var user = db.Users.Find(User.Identity.GetUserId());
+            TicketComment comment = db.TicketComments.Find(commentId);
+            if (comment != null)
+            {
+                var oldTicket = db.Tickets.AsNoTracking().First(t => t.Id == comment.TicketId);
+
+                TicketHistory th = new TicketHistory();
+                th.Property = "COMMENT DELETED";
+                th.AuthorId = user.Id;
+                th.TicketId = oldTicket.Id;
+                th.Created = DateTime.Now;
+                th.OldValue = comment.Body;
+                db.TicketHistories.Add(th);
+
+                db.TicketComments.Remove(comment);
+                db.SaveChanges();
+            }
+
+            //Had to do this because Serializing the comment was a problem.
+            //Comment had an Author that had comments that all had authors (endless loop)
+            TicketComment editedComment = new TicketComment();
+            editedComment.Id = commentId;
+
+            return Content(JsonConvert.SerializeObject(editedComment), "application/json");
         }
 
         // GET: Tickets/Delete/5

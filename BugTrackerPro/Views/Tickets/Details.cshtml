@@ -215,10 +215,11 @@
                                                     <div class="modal-content">
                                                         <div class="modal-header">
                                                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                                                            <p class="modal-title">@attachment.FileUrl</p>
+                                                            <p class="modal-title" style="color: #e74c3c"><strong>Delete Attachment</strong></p>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <p>Are you sure you want to delete this attachment?</p>
+                                                            <p>Are you sure you want to delete this attachment?</p><br /><br />
+                                                            <center><p>@attachment.FileUrl</p></center>
                                                         </div>
                                                         <div class="modal-footer">
                                                             @{
@@ -235,7 +236,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
-                                                <span class="btn-group pull-right" data-toggle="buttons" style="margin-top: 10px; z-index: 500; margin-right: 10px">
+                                                <span class="btn-group pull-right" data-toggle="buttons" style="margin-top: 10px; z-index: 50; margin-right: 10px">
                                                     <span class="btn btn-default" data-toggle="modal" data-target="#deleteAttachment-@attachment.Id">
                                                         <i class="glyph-icon icon-close"></i>
                                                     </span>
@@ -243,7 +244,7 @@
                                                 <a href="/TicketAttachments/@Model.Id/@attachment.FileUrl" target="_blank" style="text-decoration: none !important">
                                                     <center>
                                                         <div class="content-box border-top border-red">
-                                                            <p class="content-box-header clearfix">
+                                                            <p class="content-box-header clearfix" style="padding-left: 40px">
                                                                 @attachment.Extension
                                                             </p>
                                                             <div class="content-box-wrapper">
@@ -301,25 +302,40 @@
                                 <h2 class="mrg20B" style="padding-top: 100px">Comments</h2>
                                 <div class="content-box">
                                     <div class="button-pane pad10A" style="background: #efefef">
-                                        @using (Html.BeginForm("AddComment", "Tickets", new { ticketId = Model.Id }, FormMethod.Post))
-                                        {
-                                            @Html.AntiForgeryToken()
-                                            <div class="input-group">
-                                                <textarea type="text" name="body" rows="6" placeholder="Say something here..." class="form-control"></textarea>
-                                                <button class="btn btn-primary pull-right" type="submit" style="margin-top: 10px">Submit</button>
-                                            </div>
-                                        }
+                                        <div class="input-group">
+                                            <textarea id="textareaCreate" type="text" name="body" rows="6" placeholder="Say something here..." class="form-control" required></textarea>
+                                            <button type="submit" class="btn btn-primary pull-right" style="margin-top: 10px" onclick="myajaxcommentcreate(@Model.Id)">Submit</button>
+                                        </div>
                                     </div>
                                     @if (Model.Comments.Count > 0)
                                     {
                                         <hr style="margin-top: 0px" />
                                         <div class="content-box-wrapper">
-                                            <ul class="chat-box">
+                                            <ul id="comments-container" class="chat-box">
                                                 @foreach (var comment in Model.Comments.OrderByDescending(c => c.Id))
                                                 {
+                                                    <div class="modal fade" id="deleteComment-@comment.Id" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                                                    <p class="modal-title" style="color: #e74c3c"><strong>Delete Comment</strong></p>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <p>Are you sure you want to delete this comment?</p><br /><br />
+                                                                    <center><p><em>"<span id="modalComment-@comment.Id">@comment.Body</span>"</em></p></center>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                                                                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="myajaxcommentdelete(@comment.Id)">Yes</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
                                                     if (comment.AuthorId == User.Identity.GetUserId())
                                                     {
-                                                        <li class="float-right" style="clear: right">
+                                                        <li id="commentDiv-@comment.Id" class="float-right" style="clear: right">
                                                             <div class="chat-author">
                                                                 <img width="36" src="../../@comment.Author.ProfilePic" alt="">
                                                             </div>
@@ -328,19 +344,36 @@
                                                                 <div class="popover-content">
                                                                     <strong style="color: #00bca4">@comment.Author.FullName</strong><br />
                                                                     <hr />
-                                                                    @comment.Body
+                                                                    <span id="comment-@comment.Id">@comment.Body</span>
                                                                     <div class="chat-time text-no-wrap">
                                                                         <i class="glyph-icon icon-clock-o"></i>
                                                                         @comment.Created.ToString("MM/dd/yyyy") at @comment.Created.ToString("h:mm tt")
                                                                     </div>
+                                                                    @if (User.IsInRole("Admin") || User.IsInRole("Project Manager") || comment.AuthorId == User.Identity.GetUserId())
+                                                                    {
+                                                                        <div class="mrg10T" style="text-align: right">
+                                                                            <div class="btn-group dropup">
+                                                                                <button id ="editcomment-@comment.Id" type="button" class="btn btn-default collapsed" data-toggle="collapse" data-target="#edit-@comment.Id" aria-expanded="false">Edit</button>
+                                                                                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#deleteComment-@comment.Id">
+                                                                                    <i class="glyph-icon icon-close"></i>
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div id="edit-@comment.Id" class="collapse mrg20T" aria-expanded="false" style="">
+                                                                            <textarea id="textarea-@comment.Id" class="form-control" name="body" rows="3" style="width: 100%" required>@comment.Body</textarea>
+                                                                            <div class="mrg10T" style="text-align: right">
+                                                                                <input value="Save" class="btn btn-default" style="max-width: 60px" onclick="myajaxcommentedit(@comment.Id)" />
+                                                                            </div>
+                                                                        </div>
+                                                                    }
                                                                 </div>
                                                             </div>
                                                         </li>
-                                                        <li class="float-left" style="width: 100%; display: inline-block; margin-bottom: 0px"></li>
+                                                        <li id="invisDiv-@comment.Id" class="float-left" style="width: 100%; display: inline-block; margin-bottom: 0px"></li>
                                                     }
                                                     else
                                                     {
-                                                        <li class="float-left" style="width: 100%; display: inline-block">
+                                                        <li id="commentDiv-@comment.Id" class="float-left" style="width: 100%; display: inline-block">
                                                             <div class="chat-author">
                                                                 <img width="36" src="../../@comment.Author.ProfilePic" alt="">
                                                             </div>
@@ -349,11 +382,28 @@
                                                                 <div class="popover-content">
                                                                     <strong style="color: #00bca4">@comment.Author.FullName</strong><br />
                                                                     <hr />
-                                                                    @comment.Body
+                                                                    <span id="comment-@comment.Id">@comment.Body</span>
                                                                     <div class="chat-time text-no-wrap">
                                                                         <i class="glyph-icon icon-clock-o"></i>
                                                                         @comment.Created.ToString("MM/dd/yyyy") at @comment.Created.ToString("h:mm tt")
                                                                     </div>
+                                                                    @if (User.IsInRole("Admin") || User.IsInRole("Project Manager") || comment.AuthorId == User.Identity.GetUserId())
+                                                                    {
+                                                                        <div class="mrg10T" style="text-align: right">
+                                                                            <div class="btn-group dropup">
+                                                                                <button id ="editcomment-@comment.Id" type="button" class="btn btn-default collapsed" data-toggle="collapse" data-target="#edit-@comment.Id" aria-expanded="false">Edit</button>
+                                                                                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#deleteComment-@comment.Id">
+                                                                                    <i class="glyph-icon icon-close"></i>
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div id="edit-@comment.Id" class="collapse mrg20T" aria-expanded="false" style="">
+                                                                            <textarea id="textarea-@comment.Id" class="form-control" name="body" rows="3" style="width: 100%" required>@comment.Body</textarea>
+                                                                            <div class="mrg10T" style="text-align: right">
+                                                                                <input value="Save" class="btn btn-default" style="max-width: 60px" onclick="myajaxcommentedit(@comment.Id)" />
+                                                                            </div>
+                                                                        </div>
+                                                                    }
                                                                 </div>
                                                             </div>
                                                         </li>
@@ -509,6 +559,18 @@
                                                     {
                                                         <p class="tl-content">
                                                             <em>"@hist.NewValue"</em>
+                                                        </p>
+                                                    }
+                                                    else if (hist.Property == "COMMENT EDITED")
+                                                    {
+                                                        <p class="tl-content">
+                                                            Changed from <em>"@hist.OldValue"</em> to <em>"@hist.NewValue"</em>
+                                                        </p>
+                                                    }
+                                                    else if (hist.Property == "COMMENT DELETED")
+                                                    {
+                                                        <p class="tl-content">
+                                                            <em>"@hist.OldValue"</em>
                                                         </p>
                                                     }
                                                     else if (hist.Property == "NEW ASSIGNMENT")
@@ -681,6 +743,18 @@
                                                             <em>"@hist.NewValue"</em>
                                                         </p>
                                                     }
+                                                    else if (hist.Property == "COMMENT EDITED")
+                                                    {
+                                                        <p class="tl-content">
+                                                            Changed from <em>"@hist.OldValue"</em> to <em>"@hist.NewValue"</em>
+                                                        </p>
+                                                    }
+                                                    else if (hist.Property == "COMMENT DELETED")
+                                                    {
+                                                        <p class="tl-content">
+                                                            <em>"@hist.OldValue"</em>
+                                                        </p>
+                                                    }
                                                     else if (hist.Property == "NEW ASSIGNMENT")
                                                     {
                                                         <p class="tl-content">
@@ -743,6 +817,7 @@
 @section Scripts {
     <script type="text/javascript" src="../../assets/widgets/sticky/sticky.js"></script>
     <script type="text/javascript" src="../../assets/widgets/tocify/tocify.js"></script>
+    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
     <script src="~/assets/widgets/dropzone/dropzone.js"></script>
     <script type="text/javascript">
         $(function () {
@@ -760,9 +835,7 @@
                     innerTop: 10,
                     stickTo: 'document'
                 });
-
             });
-
         });
 
         //Go to a attachment section after reloading page
@@ -772,19 +845,65 @@
         };
     </script>
     <script>
-            /*============================================
-            ScrollTo Links
-            ==============================================*/
+        /*============================================
+        ScrollTo Links
+        ==============================================*/
 
-            $(function () {
-                $('#scrollToBottom').bind("click", function () {
-                    $('html, body').animate({ scrollTop: $(document).height() });
-                    return false;
-                });
-                $('#scrollToTop').bind("click", function () {
-                    $('html, body').animate({ scrollTop: 0 });
-                    return false;
-                });
+        $(function () {
+            $('#scrollToBottom').bind("click", function () {
+                $('html, body').animate({ scrollTop: $(document).height() });
+                return false;
             });
+            $('#scrollToTop').bind("click", function () {
+                $('html, body').animate({ scrollTop: 0 });
+                return false;
+            });
+        });
+        /*============================================
+            Ajax comments
+         ==============================================*/
+        function myajaxcommentcreate(id) {
+            var msg = $('#textareaCreate').val();
+            if (msg != "") {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("AddComment", "Tickets")',
+                    data: { ticketId: id, body: msg },
+                    success: function (response) {
+                        $("#comments-container").prepend('<div class="modal fade" id="deleteComment-' + response.Id + '" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button><p class="modal-title" style="color: #e74c3c"><strong>Delete Comment</strong></p></div><div class="modal-body"><p>Are you sure you want to delete this comment?</p><br /><br /><center><p><em>"<span id="modalComment-' + response.Id + '">' + response.Body + '</span>"</em></p></center></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">No</button><button type="button" class="btn btn-primary" data-dismiss="modal" onclick="myajaxcommentdelete(' + response.Id + ')">Yes</button></div></div></div></div><li id="commentDiv-' + response.Id + '" class="float-right" style="clear: right"><div class="chat-author"><img width="36" src="../../' + response.ProfilePic + '" alt=""></div><div class="popover right no-shadow"><div class="arrow"></div><div class="popover-content"><strong style="color: #00bca4">' + response.FullName + '</strong><br /><hr /><span id="comment-' + response.Id + '">' + response.Body + '</span><div class="chat-time text-no-wrap"><i class="glyph-icon icon-clock-o"></i>' + response.Created + '</div><div class="mrg10T" style="text-align: right"><div class="btn-group dropup"><button id ="editcomment-' + response.Id + '" type="button" class="btn btn-default collapsed" data-toggle="collapse" data-target="#edit-' + response.Id + '" aria-expanded="false">Edit</button><button type="button" class="btn btn-default" data-toggle="modal" data-target="#deleteComment-' + response.Id + '"><i class="glyph-icon icon-close"></i></button></div></div><div id="edit-' + response.Id + '" class="collapse mrg20T" aria-expanded="false" style=""><textarea id="textarea-' + response.Id + '" class="form-control" name="body" rows="3" style="width: 100%" required>' + response.Body + '</textarea><div class="mrg10T" style="text-align: right"><input value="Save" class="btn btn-default" style="max-width: 60px" onclick="myajaxcommentedit(' + response.Id + ')" /></div></div></div></div></li><li id="invisDiv-' + response.Id + '" class="float-left" style="width: 100%; display: inline-block; margin-bottom: 0px"></li>');
+                        $('#textareaCreate').val('');
+                    }
+                })
+            }
+        }
+
+        function myajaxcommentedit(id) {
+            var msg = $('#textarea-' + id).val();
+            if (msg != '')
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("EditComment", "Tickets")',
+                    data: { commentId: id, body: msg },
+                    success: function (response) {
+                        $('#comment-' + response.Id).html(response.Body);
+                        $('#modalComment-' + response.Id).html(response.Body);
+                        $('#editcomment-' + response.Id).click();
+                    }
+                })
+            }
+
+        function myajaxcommentdelete(id) {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("DeleteComment", "Tickets")',
+                data: { commentId: id },
+                success: function (response) {
+                    if ($('#commentDiv-' + response.Id).hasClass('float-right')) {
+                        $('#invisDiv-' + response.Id).remove();
+                    }
+                    $('#commentDiv-' + response.Id).remove();
+                }
+            })
+        }
     </script>
 }
