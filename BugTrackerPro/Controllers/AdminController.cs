@@ -10,6 +10,7 @@ using System.Web.Mvc;
 namespace BugTrackerPro.Controllers
 {
     [Authorize(Roles ="Admin")]
+    [RequireUnlockedAccount]
     public class AdminController : Universal
     {
         // GET: Admin

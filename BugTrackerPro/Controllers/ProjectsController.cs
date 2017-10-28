@@ -14,6 +14,7 @@ using Microsoft.AspNet.Identity;
 namespace BugTrackerPro.Controllers
 {
     [Authorize]
+    [RequireUnlockedAccount]
     public class ProjectsController : Universal
     {
         // GET: Projects

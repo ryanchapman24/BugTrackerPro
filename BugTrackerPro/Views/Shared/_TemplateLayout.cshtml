@@ -272,10 +272,6 @@
                 </div>
             </div>
         </div>*@
-        @{//TODO:BOOKMARK
-            var test = ViewBag.MyProjects.Count;
-            var test1 = 0;
-        }
         <div class="sb-slidebar bg-black sb-left sb-style-overlay" id="testingtesting">
             <div class="scrollable-content scrollable-slim-sidebar">
                 <div class="pad15A">
@@ -817,7 +813,7 @@
                             </div>
                         </div>
                     </div>
-                    <a class="header-btn" id="logout-btn" href="lockscreen-3.html" title="Lockscreen page example">
+                    <a class="header-btn popover-button-header tooltip-button" id="logout-btn" href="@Url.Action("Locked", "Account", new { returnUrl = Request.Url.AbsolutePath})" data-placement="bottom" title="Lock Account">
                         <i class="glyph-icon icon-linecons-lock"></i>
                     </a>
                     @if (User.IsInRole("Submitter"))

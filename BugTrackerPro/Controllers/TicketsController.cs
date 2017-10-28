@@ -25,6 +25,7 @@ namespace BugTrackerPro.Controllers
     }
 
     [Authorize]
+    [RequireUnlockedAccount]
     public class TicketsController : Universal
     {
         // GET: Tickets
@@ -437,33 +438,39 @@ namespace BugTrackerPro.Controllers
 
         // GET: Tickets/Delete/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteAttachment(int id)
+        public ActionResult DeleteAttachment(int attachmentId)
         {
             var user = db.Users.Find(User.Identity.GetUserId());
-            TicketAttachment ticketAttachment = db.TicketAttachments.Find(id);
-            var oldTicket = db.Tickets.AsNoTracking().First(t => t.Id == ticketAttachment.TicketId);
-            var fileUrl = ticketAttachment.FileUrl;
-            db.TicketAttachments.Remove(ticketAttachment);
-            db.SaveChanges();
-
-            TicketHistory th = new TicketHistory();
-            th.Property = "ATTACHMENT DELETED";
-            th.AuthorId = user.Id;
-            th.TicketId = oldTicket.Id;
-            th.Created = DateTime.Now;
-            th.OldValue = fileUrl;
-            db.TicketHistories.Add(th);
-            db.SaveChanges();
-
-            if (fileUrl != null)
+            TicketAttachment ticketAttachment = db.TicketAttachments.Find(attachmentId);
+            if (ticketAttachment != null)
             {
-                var filePath = Server.MapPath("~/TicketAttachments/" + oldTicket.Id + "/" + fileUrl);
-                System.IO.File.Delete(filePath);
+                var oldTicket = db.Tickets.AsNoTracking().First(t => t.Id == ticketAttachment.TicketId);
+                var fileUrl = ticketAttachment.FileUrl;
+
+                TicketHistory th = new TicketHistory();
+                th.Property = "ATTACHMENT DELETED";
+                th.AuthorId = user.Id;
+                th.TicketId = oldTicket.Id;
+                th.Created = DateTime.Now;
+                th.OldValue = fileUrl;
+                db.TicketHistories.Add(th);
+
+                db.TicketAttachments.Remove(ticketAttachment);
+                db.SaveChanges();
+
+                if (fileUrl != null)
+                {
+                    var filePath = Server.MapPath("~/TicketAttachments/" + oldTicket.Id + "/" + fileUrl);
+                    System.IO.File.Delete(filePath);
+                }
             }
 
+            //Had to do this because Serializing the comment was a problem.
+            //Comment had an Author that had comments that all had authors (endless loop)
+            TicketAttachment deletedAttachment = new TicketAttachment();
+            deletedAttachment.Id = attachmentId;
 
-            return Redirect(Url.Action("Details", "Tickets", new { id = oldTicket.Id }) + "#Comments");
+            return Content(JsonConvert.SerializeObject(deletedAttachment), "application/json");
         }
 
         // POST: Tickets/Edit/5
@@ -615,10 +622,10 @@ namespace BugTrackerPro.Controllers
 
             //Had to do this because Serializing the comment was a problem.
             //Comment had an Author that had comments that all had authors (endless loop)
-            TicketComment editedComment = new TicketComment();
-            editedComment.Id = commentId;
+            TicketComment deletedComment = new TicketComment();
+            deletedComment.Id = commentId;
 
-            return Content(JsonConvert.SerializeObject(editedComment), "application/json");
+            return Content(JsonConvert.SerializeObject(deletedComment), "application/json");
         }
 
         // GET: Tickets/Delete/5

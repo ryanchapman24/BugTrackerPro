@@ -1,16 +1,43 @@
 ﻿using BugTrackerPro.Models;
+using BugTrackerPro.Models.Helpers;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
 namespace BugTrackerPro.Controllers
 {
     [Authorize]
+    [RequireUnlockedAccount]
     public class HomeController : Universal
     {
+        private ApplicationSignInManager _signInManager;
+
+        public HomeController()
+        {
+        }
+
+        public HomeController(ApplicationSignInManager signInManager)
+        {
+            SignInManager = signInManager;
+        }
+
+        public ApplicationSignInManager SignInManager
+        {
+            get
+            {
+                return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
+            }
+            private set
+            {
+                _signInManager = value;
+            }
+        }
+
         public ActionResult Index()
         {
             var user = db.Users.Find(User.Identity.GetUserId());
@@ -43,20 +70,6 @@ namespace BugTrackerPro.Controllers
                 }
             }
             return View(model);
-        }
-
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
         }
 
         public ActionResult Error()

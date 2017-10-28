@@ -13,6 +13,7 @@ using BugTrackerPro.Models.Helpers;
 namespace BugTrackerPro.Controllers
 {
     [Authorize]
+    [RequireUnlockedAccount]
     public class ManageController : Universal
     {
         private ApplicationSignInManager _signInManager;

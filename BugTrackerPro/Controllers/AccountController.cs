@@ -79,6 +79,9 @@ namespace BugTrackerPro.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
+                    var user = db.Users.First(u => u.Email == model.Email);
+                    user.Locked = false;
+                    db.SaveChanges();
                     return RedirectToLocal(returnUrl);
                 case SignInStatus.LockedOut:
                     return View("Lockout");
@@ -87,6 +90,43 @@ namespace BugTrackerPro.Controllers
                 case SignInStatus.Failure:
                 default:
                     ModelState.AddModelError("", "Invalid login attempt.");
+                    return View(model);
+            }
+        }
+
+        public ActionResult Locked(string returnUrl)
+        {
+            var user = db.Users.Find(User.Identity.GetUserId());
+            user.Locked = true;
+            db.SaveChanges();
+
+            ViewBag.ReturnUrl = returnUrl;
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Unlock(UnlockViewModel model, string returnUrl)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = db.Users.Find(User.Identity.GetUserId());
+
+            // This doesn't count login failures towards account lockout
+            // To enable password failures to trigger account lockout, change to shouldLockout: true
+            var result = await SignInManager.PasswordSignInAsync(user.Email, model.Password, model.RememberMe, shouldLockout: false);
+            switch (result)
+            {
+                case SignInStatus.Success:
+                    user.Locked = false;
+                    db.SaveChanges();
+                    return RedirectToLocal(returnUrl);
+                case SignInStatus.Failure:
+                default:
+                    ModelState.AddModelError("", "Invalid unlock attempt.");
                     return View(model);
             }
         }
@@ -153,7 +193,7 @@ namespace BugTrackerPro.Controllers
             {
                 var pPic = "/assets/icons/bug_icon.png";
 
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, FirstName = model.FirstName, LastName = model.LastName, ProfilePic = pPic };
+                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, FirstName = model.FirstName, LastName = model.LastName, ProfilePic = pPic, Locked = false };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {

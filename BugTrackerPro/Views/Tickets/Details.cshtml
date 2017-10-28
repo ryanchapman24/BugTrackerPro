@@ -103,7 +103,7 @@
                                                         Submitter
                                                     </p>
                                                     <div class="content-box-wrapper">
-                                                        <img class="img-circle" src="../..@Model.OwnerUser.ProfilePic" alt="" style="background-color: white; width: 100px; margin-bottom: 10px">
+                                                        <img class="img-circle img-bordered" src="../..@Model.OwnerUser.ProfilePic" alt="" style="background-color: white; width: 100px; margin-bottom: 10px">
                                                         <div class="divider"></div>
                                                         <p><strong style="color: #00bca4">@Model.OwnerUser.FullName</strong></p>
                                                     </div>
@@ -119,7 +119,7 @@
                                                     <div class="content-box-wrapper">
                                                         @if (Model.AssignToUserId != null)
                                                         {
-                                                            <img class="img-circle" src="../..@Model.AssignToUser.ProfilePic" alt="" style="background-color: white; width: 100px; margin-bottom: 10px">
+                                                            <img class="img-circle img-bordered" src="../..@Model.AssignToUser.ProfilePic" alt="" style="background-color: white; width: 100px; margin-bottom: 10px">
                                                             <div class="divider"></div>
                                                             <p><strong style="color: #00bca4">@Model.AssignToUser.FullName</strong></p>
                                                         }
@@ -222,20 +222,13 @@
                                                             <center><p>@attachment.FileUrl</p></center>
                                                         </div>
                                                         <div class="modal-footer">
-                                                            @{
-                                                                string attachFormId = "delAttachment" + attachment.Id;
-                                                            }
-                                                            @using (Html.BeginForm("DeleteAttachment", "Tickets", new { id = attachment.Id }, FormMethod.Post, new { id = attachFormId }))
-                                                            {
-                                                                @Html.AntiForgeryToken()
-                                                            }
                                                             <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
-                                                            <button type="button" class="btn btn-primary" onclick="javascript:document.getElementById('@attachFormId').submit()">Yes</button>
+                                                            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="myajaxattachmentdelete(@attachment.Id)">Yes</button>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-4">
+                                            <div class="col-md-4" id="attachmentDiv-@attachment.Id">
                                                 <span class="btn-group pull-right" data-toggle="buttons" style="margin-top: 10px; z-index: 50; margin-right: 10px">
                                                     <span class="btn btn-default" data-toggle="modal" data-target="#deleteAttachment-@attachment.Id">
                                                         <i class="glyph-icon icon-close"></i>
@@ -552,7 +545,7 @@
                                                     else if (hist.Property == "ATTACHMENT DELETED")
                                                     {
                                                         <p class="tl-content">
-                                                            @hist.NewValue
+                                                            @hist.OldValue
                                                         </p>
                                                     }
                                                     else if (hist.Property == "NEW COMMENT")
@@ -734,7 +727,7 @@
                                                     else if (hist.Property == "ATTACHMENT DELETED")
                                                     {
                                                         <p class="tl-content">
-                                                            @hist.NewValue
+                                                            @hist.OldValue
                                                         </p>
                                                     }
                                                     else if (hist.Property == "NEW COMMENT")
@@ -902,6 +895,17 @@
                         $('#invisDiv-' + response.Id).remove();
                     }
                     $('#commentDiv-' + response.Id).remove();
+                }
+            })
+        }
+
+        function myajaxattachmentdelete(id) {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("DeleteAttachment", "Tickets")',
+                data: { attachmentId: id },
+                success: function (response) {
+                    $('#attachmentDiv-' + response.Id).remove();
                 }
             })
         }
