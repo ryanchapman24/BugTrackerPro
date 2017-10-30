@@ -397,6 +397,7 @@
     <Content Include="assets\image-resources\blurred-img\blurred-img-3.jpg" />
     <Content Include="assets\image-resources\blurred-img\blurred-img-4.jpg" />
     <Content Include="assets\image-resources\blurred-img\blurred-img-5.jpg" />
+    <Content Include="assets\image-resources\citylights.jpg" />
     <Content Include="assets\image-resources\cool-mask-wallpaper-1.jpg" />
     <Content Include="assets\image-resources\dark-creepy-scary-horror-evil-art-artistic-wallpaper-1.jpg" />
     <Content Include="assets\image-resources\full-bg\full-bg-1.jpg" />
@@ -1192,6 +1193,7 @@
     <Content Include="assets\widgets\ckeditor\plugins\wsc\LICENSE.md" />
     <Content Include="assets\widgets\ckeditor\plugins\wsc\README.md" />
     <Content Include="assets\widgets\ckeditor\skins\bootstrapck\readme.md" />
+    <Content Include="private.config" />
     <None Include="Properties\PublishProfiles\chaptracker - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\chaptracker - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-3.2.1.intellisense.js" />
