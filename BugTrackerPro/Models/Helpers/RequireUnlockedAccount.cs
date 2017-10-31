@@ -12,8 +12,8 @@ namespace BugTrackerPro.Models.Helpers
 {
     public class RequireUnlockedAccount : AuthorizeAttribute
     {
-        public ApplicationDbContext db = new ApplicationDbContext();
-        
+        //public ApplicationDbContext db = new ApplicationDbContext();
+
         protected override bool AuthorizeCore(HttpContextBase httpContext)
         {
             var isAuthorized = base.AuthorizeCore(httpContext);
@@ -21,15 +21,17 @@ namespace BugTrackerPro.Models.Helpers
             {
                 return false;
             }
-
-            var userId = httpContext.User.Identity.GetUserId();
-            var user = db.Users.AsNoTracking().First(u => u.Id == userId);
-            var userStatus = user.Locked;
-            if (userStatus == false)
+            using (var db = new ApplicationDbContext())
             {
-                return true;
+                var userId = httpContext.User.Identity.GetUserId();
+                var user = db.Users.AsNoTracking().First(u => u.Id == userId);
+                var userStatus = user.Locked;
+                if (userStatus == false)
+                {
+                    return true;
+                }
+                return false;
             }
-            return false;
         }
 
         protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)

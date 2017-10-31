@@ -15,7 +15,10 @@
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.Id)
         @Html.HiddenFor(model => model.TicketStatusId)
-
+        <div class="form-group">
+            <div class="col-md-2"></div>
+            <div class="col-md-6"><span style="color: #00bca4">Only the developers on the project "@Model.Project.Title" will appear in this list.</span></div>
+        </div>
         <div class="form-group">
             <label class="control-label col-md-2">Developer</label>
             <div class="col-md-6">

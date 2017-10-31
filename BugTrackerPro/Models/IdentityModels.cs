@@ -30,6 +30,7 @@ namespace BugTrackerPro.Models
             Histories = new HashSet<TicketHistory>();
             Comments = new HashSet<TicketComment>();
             Attachments = new HashSet<TicketAttachment>();
+            Notifications = new HashSet<Notification>();
             //OwnerUserTickets = new HashSet<Ticket>();
             //AssignToUserTickets = new HashSet<Ticket>();
         }
@@ -38,6 +39,7 @@ namespace BugTrackerPro.Models
         public virtual ICollection<TicketHistory> Histories { get; set; }
         public virtual ICollection<TicketComment> Comments { get; set; }
         public virtual ICollection<TicketAttachment> Attachments { get; set; }
+        public virtual ICollection<Notification> Notifications { get; set; }
         //public virtual ICollection<Ticket> OwnerUserTickets { get; set; }
         //public virtual ICollection<Ticket> AssignToUserTickets { get; set; }
 
@@ -86,5 +88,6 @@ namespace BugTrackerPro.Models
         public DbSet<TicketPriority> TicketPriorities { get; set; }
         public DbSet<TicketStatus> TicketStatuses { get; set; }
         public DbSet<TicketType> TicketTypes { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
     }
 }

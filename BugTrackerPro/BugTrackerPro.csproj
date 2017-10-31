@@ -206,6 +206,7 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AdminUserViewModels.cs" />
+    <Compile Include="Models\CodeFirst\Notification.cs" />
     <Compile Include="Models\CodeFirst\Project.cs" />
     <Compile Include="Models\CodeFirst\Ticket.cs" />
     <Compile Include="Models\CodeFirst\TicketAttachment.cs" />

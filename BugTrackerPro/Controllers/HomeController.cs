@@ -1,7 +1,9 @@
 ﻿using BugTrackerPro.Models;
+using BugTrackerPro.Models.CodeFirst;
 using BugTrackerPro.Models.Helpers;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +13,12 @@ using System.Web.Mvc;
 
 namespace BugTrackerPro.Controllers
 {
+    public class LayoutNotifs
+    {
+        public int Count { get; set; }
+        public IEnumerable<Notification> Notifications { get; set; }
+    }
+
     [Authorize]
     [RequireUnlockedAccount]
     public class HomeController : Universal
@@ -75,6 +83,17 @@ namespace BugTrackerPro.Controllers
         public ActionResult Error()
         {
             return View();
+        }
+        [HttpPost]
+        public ActionResult GetNotifications(int nCount)
+        {
+            var user = db.Users.Find(User.Identity.GetUserId());
+            var notifs = user.Notifications.Where(n => n.Seen == false).OrderByDescending(n => n.Id);
+            LayoutNotifs ln = new LayoutNotifs();
+            ln.Count = notifs.Count();
+            ln.Notifications = notifs.Take(ln.Count - nCount);
+
+            return Content(JsonConvert.SerializeObject(ln, Formatting.Indented, new JsonSerializerSettings {PreserveReferencesHandling = PreserveReferencesHandling.Objects}), "application/json");
         }
 
         protected override void Dispose(bool disposing)

@@ -62,7 +62,12 @@ namespace BugTrackerPro.Models
                 {
                     ViewBag.TicketCompletion = 0;
                 }
+
+                var notifications = user.Notifications.Where(n => n.Seen == false).OrderByDescending(n => n.Id);
+                ViewBag.Notifications = notifications.ToList();
+                ViewBag.NotificationCount = notifications.Count();
             }
+
 
             base.OnActionExecuted(filterContext);
         }

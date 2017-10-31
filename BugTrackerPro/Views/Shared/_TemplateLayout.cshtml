@@ -145,7 +145,7 @@
     </script>
 </head>
 
-<body class="fixed-header scrollable-content scrollable-nice">
+<body class="fixed-header">
     <div id="sb-site">
         @*<div class="sb-slidebar bg-black sb-left sb-style-overlay">
             <div class="scrollable-content scrollable-slim-sidebar">
@@ -578,8 +578,8 @@
                     </a>*@
                     <div class="dropdown" id="notifications-btn">
                         <a data-toggle="dropdown" href="#" title="">
-                            <span class="small-badge bg-yellow"></span>
-                            <i class="glyph-icon icon-linecons-megaphone"></i>
+                            <span id="notifBadge" class="bs-badge badge-absolute float-right badge-primary">@ViewBag.NotificationCount</span>
+                            <i class="glyph-icon icon-linecons-lightbulb"></i>
                         </a>
                         <div class="dropdown-menu box-md float-right">
                             <div class="popover-title display-block clearfix pad10A">
@@ -589,16 +589,19 @@
                                 </a>
                             </div>
                             <div class="scrollable-content scrollable-slim-box">
-                                <ul class="no-border notifications-box">
-                                    <li>
-                                        <span class="bg-danger icon-notification glyph-icon icon-bullhorn"></span>
-                                        <span class="notification-text">This is an error notification</span>
-                                        <div class="notification-time">
-                                            a few seconds ago
-                                            <span class="glyph-icon icon-clock-o"></span>
-                                        </div>
-                                    </li>
-                                    <li>
+                                <ul id="notifContainer" class="no-border notifications-box">
+                                    @foreach (var notification in ViewBag.Notifications)
+                                    {
+                                        <li>
+                                            <span class="bg-danger icon-notification glyph-icon icon-bullhorn"></span>
+                                            <span class="notification-text">@notification.Description</span>
+                                            <div class="notification-time">
+                                                @notification.Created.ToString("M/dd/yyyy H:mm:ss tt")
+                                                <span class="glyph-icon icon-clock-o"></span>
+                                            </div>
+                                        </li>
+                                    }
+                                    @*<li>
                                         <span class="bg-warning icon-notification glyph-icon icon-users"></span>
                                         <span class="notification-text font-blue">This is a warning notification</span>
                                         <div class="notification-time">
@@ -677,7 +680,7 @@
                                             <b>15</b> minutes ago
                                             <span class="glyph-icon icon-clock-o"></span>
                                         </div>
-                                    </li>
+                                    </li>*@
                                 </ul>
                             </div>
                             <div class="pad10A button-pane button-pane-alt text-center">
@@ -1112,7 +1115,22 @@
         <script type="text/javascript" src="../../assets/widgets/datatable/datatable-bootstrap.js"></script>
         <script type="text/javascript" src="../../assets/widgets/datatable/datatable-tabletools.js"></script>
         <script type="text/javascript" src="../../assets/widgets/datatable/datatable-reorder.js"></script>
-
+        <script>
+            setInterval(function () {
+                var count = $('#notifBadge').html();
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("GetNotifications", "Home")',
+                    data: { nCount: count },
+                    success: function (response) {
+                        $('#notifBadge').html(response.Count);
+                        $.each(response.Notifications, function (key, value) {
+                            $('#notifContainer').prepend('<li><span class="bg-danger icon-notification glyph-icon icon-bullhorn"></span><span class="notification-text">' + value.Description + '</span><div class="notification-time">' + value.Created + '<span class="glyph-icon icon-clock-o"></span></li>');
+                        });
+                    }
+                });
+            }, 5000);
+        </script>
         @RenderSection("scripts", required: false)
     </div>
 </body>
