@@ -103,7 +103,7 @@ li.active a.list-group-item:focus,
 #nav-toggle span:before,
 #nav-toggle span:after {
     color: #fff;
-    background: #00bca4;
+    background: #00bca4 !important;
 }
 
 .font-secondary,

@@ -86,6 +86,21 @@ namespace BugTrackerPro.Controllers
                 ProjectAssignmentsHelper helper = new ProjectAssignmentsHelper();
                 helper.AddUserToProject(attachUser.Id, attachProject.Id);
 
+                UserRolesHelper urh = new UserRolesHelper();
+                foreach (var user in urh.UsersInRole("Admin"))
+                {
+                    Notification n = new Notification();
+                    n.Type = "NEW PROJECT";
+                    n.Created = DateTime.Now;
+                    n.CreatedString = DateTime.Now.ToString("M/d/yyyy h:mm:ss tt");
+                    n.Description = "New project created.";
+                    n.ProjectId = project.Id;
+                    n.NotifyUserId = user.Id;
+                    n.Seen = false;
+                    db.Notifications.Add(n);
+                }
+                db.SaveChanges();
+
                 return RedirectToAction("Index");
             }
 
@@ -240,7 +255,13 @@ namespace BugTrackerPro.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
+
             Project project = db.Projects.Find(id);
+            var projectNotifs = db.Notifications.Where(n => n.ProjectId == project.Id);
+            foreach (var n in projectNotifs)
+            {
+                db.Notifications.Remove(n);
+            }
             db.Projects.Remove(project);
             db.SaveChanges();
             return RedirectToAction("Index");

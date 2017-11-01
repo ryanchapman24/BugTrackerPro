@@ -96,6 +96,37 @@ namespace BugTrackerPro.Controllers
             return Content(JsonConvert.SerializeObject(ln, Formatting.Indented, new JsonSerializerSettings {PreserveReferencesHandling = PreserveReferencesHandling.Objects}), "application/json");
         }
 
+        public ActionResult ViewNotification(int id)
+        {
+            var notification = db.Notifications.Find(id);
+            notification.Seen = true;
+            db.SaveChanges();
+
+            if (notification.Type.Contains("PROJECT"))
+            {
+                return RedirectToAction("Details", "Projects", new { id = notification.ProjectId });
+            }
+            else
+            {
+                return RedirectToAction("Details", "Tickets", new { id = notification.TicketId });
+            }
+        }
+
+        [HttpPost]
+        public ActionResult ClearNotifications()
+        {
+            var user = db.Users.Find(User.Identity.GetUserId());
+            foreach (var notification in user.Notifications.Where(n => n.Seen == false))
+            {
+                notification.Seen = true;
+                db.SaveChanges();
+            }
+
+            var response = true;
+
+            return Content(JsonConvert.SerializeObject(response), "application/json");
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

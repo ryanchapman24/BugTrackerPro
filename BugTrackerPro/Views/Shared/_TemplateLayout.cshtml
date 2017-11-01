@@ -581,25 +581,42 @@
                             <span id="notifBadge" class="bs-badge badge-absolute float-right badge-primary">@ViewBag.NotificationCount</span>
                             <i class="glyph-icon icon-linecons-lightbulb"></i>
                         </a>
-                        <div class="dropdown-menu box-md float-right">
+                        <div id="notifDropdown" class="dropdown-menu box-md float-right">
                             <div class="popover-title display-block clearfix pad10A">
                                 Notifications
-                                <a class="text-transform-cap font-primary font-normal btn-link float-right" href="#" title="View more options">
-                                    More options...
-                                </a>
+                                @if  (ViewBag.NotificationCount > 0)
+                                {
+                                    <a id="clearNotifs" class="text-transform-cap font-primary font-normal btn-link float-right" href="#" onclick="clearNotifs()">
+                                        Clear
+                                    </a>
+                                }
                             </div>
                             <div class="scrollable-content scrollable-slim-box">
                                 <ul id="notifContainer" class="no-border notifications-box">
                                     @foreach (var notification in ViewBag.Notifications)
                                     {
-                                        <li>
-                                            <span class="bg-danger icon-notification glyph-icon icon-bullhorn"></span>
-                                            <span class="notification-text">@notification.Description</span>
-                                            <div class="notification-time">
-                                                @notification.Created.ToString("M/dd/yyyy H:mm:ss tt")
-                                                <span class="glyph-icon icon-clock-o"></span>
-                                            </div>
-                                        </li>
+                                        if (notification.Type == "NEW PROJECT")
+                                        {
+                                            <li class="notif" style="cursor: pointer" onclick="location.href='@Url.Action("ViewNotification", "Home", new { id = notification.Id })'">
+                                                <span class="bg-primary icon-notification glyph-icon icon-cog"></span>
+                                                <span class="notification-text">@notification.Description</span>
+                                                <div class="notification-time">
+                                                    @notification.CreatedString
+                                                    <span class="glyph-icon icon-clock-o"></span>
+                                                </div>
+                                            </li>
+                                        }
+                                        else
+                                        {
+                                            <li class="notif" style="cursor: pointer" onclick="location.href='@Url.Action("ViewNotification", "Home", new { id = notification.Id })'">
+                                                <span class="bg-danger icon-notification glyph-icon icon-bullhorn"></span>
+                                                <span class="notification-text">@notification.Description</span>
+                                                <div class="notification-time">
+                                                    @notification.CreatedString
+                                                    <span class="glyph-icon icon-clock-o"></span>
+                                                </div>
+                                            </li>
+                                        }
                                     }
                                     @*<li>
                                         <span class="bg-warning icon-notification glyph-icon icon-users"></span>
@@ -1116,6 +1133,13 @@
         <script type="text/javascript" src="../../assets/widgets/datatable/datatable-tabletools.js"></script>
         <script type="text/javascript" src="../../assets/widgets/datatable/datatable-reorder.js"></script>
         <script>
+            $(document).ready(function () {
+                if (@ViewBag.NotificationCount == 0)
+                {
+                    $('#notifDropdown').addClass('hidden');
+                }
+            });
+
             setInterval(function () {
                 var count = $('#notifBadge').html();
                 $.ajax({
@@ -1124,12 +1148,36 @@
                     data: { nCount: count },
                     success: function (response) {
                         $('#notifBadge').html(response.Count);
+                        if (response.Count == 0) {
+                            $('#notifDropdown').addClass('hidden');
+                        }
+                        else {
+                            $('#notifDropdown').removeClass('hidden');
+                        }
                         $.each(response.Notifications, function (key, value) {
-                            $('#notifContainer').prepend('<li><span class="bg-danger icon-notification glyph-icon icon-bullhorn"></span><span class="notification-text">' + value.Description + '</span><div class="notification-time">' + value.Created + '<span class="glyph-icon icon-clock-o"></span></li>');
+                            var link = "'/Home/ViewNotification/" + value.Id + "'";
+                            if (value.Type == "NEW PROJECT") {
+                                $('#notifContainer').prepend('<li class="notif" style="cursor: pointer" onclick="location.href=' + link + '"><span class="bg-primary icon-notification glyph-icon icon-cog"></span><span class="notification-text">' + value.Description + '</span><div class="notification-time">' + value.CreatedString + '<span class="glyph-icon icon-clock-o"></span></li>');
+                            }
+                            else {
+                                $('#notifContainer').prepend('<li class="notif" style="cursor: pointer" onclick="location.href=' + link + '"><span class="bg-danger icon-notification glyph-icon icon-bullhorn"></span><span class="notification-text">' + value.Description + '</span><div class="notification-time">' + value.CreatedString + '<span class="glyph-icon icon-clock-o"></span></li>');
+                            }
                         });
                     }
                 });
             }, 5000);
+
+            function clearNotifs() {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("ClearNotifications", "Home")',
+                success: function (response) {                    
+                    $('.notif').remove();
+                    $('#notifDropdown').addClass('hidden');
+                    $('#notifBadge').html(0);
+                }
+            })
+        }
         </script>
         @RenderSection("scripts", required: false)
     </div>
