@@ -93,7 +93,7 @@ namespace BugTrackerPro.Controllers
                     n.Type = "NEW PROJECT";
                     n.Created = DateTime.Now;
                     n.CreatedString = DateTime.Now.ToString("M/d/yyyy h:mm:ss tt");
-                    n.Description = "New project created.";
+                    n.Description = "New project created";
                     n.ProjectId = project.Id;
                     n.NotifyUserId = user.Id;
                     n.Seen = false;
@@ -196,6 +196,13 @@ namespace BugTrackerPro.Controllers
 
             foreach (var user in projUsers)
             {
+                //foreach (var notif in user.Notifications.Where(n => n.ProjectId == project.Id))
+                //{
+                //    if (!urh.IsUserInRole(user.Id,"Admin"))
+                //    {
+                //        db.Notifications.Remove(notif);
+                //    }
+                //}
                 foreach (var ticket in project.Tickets.Where(t => t.AssignToUserId == user.Id).ToList())
                 {
                     var oldTicket = db.Tickets.AsNoTracking().First(t => t.Id == ticket.Id);
@@ -208,6 +215,20 @@ namespace BugTrackerPro.Controllers
                     th.Created = DateTime.Now;
                     th.OldValue = oldTicket.AssignToUser.FullName;
                     db.TicketHistories.Add(th);
+
+                    foreach (var u in db.Users.Where(u => u.Roles.Any(r => r.RoleId == "dec84673-970c-4770-aa44-8fb51f70e2b7") || (u.Roles.Any(r => r.RoleId == "b9ab4f3d-4e8b-42b9-8b63-8326c768934a") && u.Projects.Any(p => p.Id == ticket.ProjectId))))
+                    {
+                        Notification n = new Notification();
+                        n.Type = "UNASSIGNED TICKET";
+                        n.Created = DateTime.Now;
+                        n.CreatedString = DateTime.Now.ToString("M/d/yyyy h:mm:ss tt");
+                        n.Description = "Ticket requires assignment [#" + ticket.Id + "]";
+                        n.TicketId = ticket.Id;
+                        n.ProjectId = ticket.ProjectId;
+                        n.NotifyUserId = u.Id;
+                        n.Seen = false;
+                        db.Notifications.Add(n);
+                    }
 
                     if (ticket.TicketStatusId != 4)
                     {
@@ -226,8 +247,8 @@ namespace BugTrackerPro.Controllers
                     db.Tickets.Attach(ticket);
                     db.Entry(ticket).Property("AssignToUserId").IsModified = true;
                     db.Entry(ticket).Property("TicketStatusId").IsModified = true;
-                    db.SaveChanges();
                 }
+                db.SaveChanges();
             }
 
             return RedirectToAction("Index");

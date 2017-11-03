@@ -88,6 +88,7 @@ namespace BugTrackerPro.Controllers
         public ActionResult GetNotifications(int nCount)
         {
             var user = db.Users.Find(User.Identity.GetUserId());
+            
             var notifs = user.Notifications.Where(n => n.Seen == false).OrderByDescending(n => n.Id);
             LayoutNotifs ln = new LayoutNotifs();
             ln.Count = notifs.Count();

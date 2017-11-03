@@ -78,6 +78,20 @@ namespace BugTrackerPro.Controllers
                     th.OldValue = oldTicket.AssignToUser.FullName;
                     db.TicketHistories.Add(th);
 
+                    foreach (var u in db.Users.Where(u => u.Roles.Any(r => r.RoleId == "dec84673-970c-4770-aa44-8fb51f70e2b7") || (u.Roles.Any(r => r.RoleId == "b9ab4f3d-4e8b-42b9-8b63-8326c768934a") && u.Projects.Any(p => p.Id == ticket.ProjectId))))
+                    {
+                        Notification n = new Notification();
+                        n.Type = "UNASSIGNED TICKET";
+                        n.Created = DateTime.Now;
+                        n.CreatedString = DateTime.Now.ToString("M/d/yyyy h:mm:ss tt");
+                        n.Description = "Ticket requires assignment [#" + ticket.Id + "]";
+                        n.TicketId = ticket.Id;
+                        n.ProjectId = ticket.ProjectId;
+                        n.NotifyUserId = u.Id;
+                        n.Seen = false;
+                        db.Notifications.Add(n);
+                    }
+
                     if (ticket.TicketStatusId != 4)
                     {
                         ticket.TicketStatusId = 1;

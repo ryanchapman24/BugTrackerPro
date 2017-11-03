@@ -145,7 +145,7 @@
     </script>
 </head>
 
-<body class="fixed-header">
+<body class="fixed-header scrollable-content scrollable-nice">
     <div id="sb-site">
         @*<div class="sb-slidebar bg-black sb-left sb-style-overlay">
             <div class="scrollable-content scrollable-slim-sidebar">
@@ -606,10 +606,43 @@
                                                 </div>
                                             </li>
                                         }
-                                        else
+                                        else if (notification.Type == "UNASSIGNED TICKET")
                                         {
                                             <li class="notif" style="cursor: pointer" onclick="location.href='@Url.Action("ViewNotification", "Home", new { id = notification.Id })'">
-                                                <span class="bg-danger icon-notification glyph-icon icon-bullhorn"></span>
+                                                <span class="bg-red icon-notification glyph-icon icon-tag"></span>
+                                                <span class="notification-text">@notification.Description</span>
+                                                <div class="notification-time">
+                                                    @notification.CreatedString
+                                                    <span class="glyph-icon icon-clock-o"></span>
+                                                </div>
+                                            </li>
+                                        }
+                                        else if (notification.Type == "NEW ASSIGNMENT")
+                                        {
+                                            <li class="notif" style="cursor: pointer" onclick="location.href='@Url.Action("ViewNotification", "Home", new { id = notification.Id })'">
+                                                <span class="bg-primary icon-notification glyph-icon icon-tag"></span>
+                                                <span class="notification-text">@notification.Description</span>
+                                                <div class="notification-time">
+                                                    @notification.CreatedString
+                                                    <span class="glyph-icon icon-clock-o"></span>
+                                                </div>
+                                            </li>
+                                        }
+                                        else if (notification.Type == "ASSIGNMENT CHANGE")
+                                        {
+                                            <li class="notif" style="cursor: pointer" onclick="location.href='@Url.Action("ViewNotification", "Home", new { id = notification.Id })'">
+                                                <span class="bg-primary icon-notification glyph-icon icon-tag" style="background-color: #8da0aa !important"></span>
+                                                <span class="notification-text">@notification.Description</span>
+                                                <div class="notification-time">
+                                                    @notification.CreatedString
+                                                    <span class="glyph-icon icon-clock-o"></span>
+                                                </div>
+                                            </li>
+                                        }
+                                        else if (notification.Type == "TICKET EDITED" || notification.Type == "NEW ATTACHMENT" || notification.Type == "NEW COMMENT")
+                                        {
+                                            <li class="notif" style="cursor: pointer" onclick="location.href='@Url.Action("ViewNotification", "Home", new { id = notification.Id })'">
+                                                <span class="bg-primary icon-notification glyph-icon icon-tag" style="background-color: #8da0aa !important"></span>
                                                 <span class="notification-text">@notification.Description</span>
                                                 <div class="notification-time">
                                                     @notification.CreatedString
@@ -1137,6 +1170,7 @@
                 if (@ViewBag.NotificationCount == 0)
                 {
                     $('#notifDropdown').addClass('hidden');
+                    $('#notifBadge').addClass('hidden');
                 }
             });
 
@@ -1150,17 +1184,28 @@
                         $('#notifBadge').html(response.Count);
                         if (response.Count == 0) {
                             $('#notifDropdown').addClass('hidden');
+                            $('#notifBadge').addClass('hidden');
                         }
                         else {
                             $('#notifDropdown').removeClass('hidden');
+                            $('#notifBadge').removeClass('hidden');
                         }
                         $.each(response.Notifications, function (key, value) {
                             var link = "'/Home/ViewNotification/" + value.Id + "'";
                             if (value.Type == "NEW PROJECT") {
                                 $('#notifContainer').prepend('<li class="notif" style="cursor: pointer" onclick="location.href=' + link + '"><span class="bg-primary icon-notification glyph-icon icon-cog"></span><span class="notification-text">' + value.Description + '</span><div class="notification-time">' + value.CreatedString + '<span class="glyph-icon icon-clock-o"></span></li>');
                             }
-                            else {
-                                $('#notifContainer').prepend('<li class="notif" style="cursor: pointer" onclick="location.href=' + link + '"><span class="bg-danger icon-notification glyph-icon icon-bullhorn"></span><span class="notification-text">' + value.Description + '</span><div class="notification-time">' + value.CreatedString + '<span class="glyph-icon icon-clock-o"></span></li>');
+                            else if (value.Type == "UNASSIGNED TICKET") {
+                                $('#notifContainer').prepend('<li class="notif" style="cursor: pointer" onclick="location.href=' + link + '"><span class="bg-red icon-notification glyph-icon icon-tag"></span><span class="notification-text">' + value.Description + '</span><div class="notification-time">' + value.CreatedString + '<span class="glyph-icon icon-clock-o"></span></li>');
+                            }
+                            else if (value.Type == "NEW ASSIGNMENT") {
+                                $('#notifContainer').prepend('<li class="notif" style="cursor: pointer" onclick="location.href=' + link + '"><span class="bg-primary icon-notification glyph-icon icon-tag"></span><span class="notification-text">' + value.Description + '</span><div class="notification-time">' + value.CreatedString + '<span class="glyph-icon icon-clock-o"></span></li>');
+                            }
+                            else if (value.Type == "ASSIGNMENT CHANGE") {
+                                $('#notifContainer').prepend('<li class="notif" style="cursor: pointer" onclick="location.href=' + link + '"><span class="bg-primary icon-notification glyph-icon icon-tag" style="background-color: #8da0aa !important"></span><span class="notification-text">' + value.Description + '</span><div class="notification-time">' + value.CreatedString + '<span class="glyph-icon icon-clock-o"></span></li>');
+                            }
+                            else if (value.Type == "TICKET EDITED" || value.Type == "NEW ATTACHMENT" || value.Type == "NEW COMMENT") {
+                                $('#notifContainer').prepend('<li class="notif" style="cursor: pointer" onclick="location.href=' + link + '"><span class="bg-primary icon-notification glyph-icon icon-tag" style="background-color: #8da0aa !important"></span><span class="notification-text">' + value.Description + '</span><div class="notification-time">' + value.CreatedString + '<span class="glyph-icon icon-clock-o"></span></li>');
                             }
                         });
                     }
@@ -1174,6 +1219,7 @@
                 success: function (response) {                    
                     $('.notif').remove();
                     $('#notifDropdown').addClass('hidden');
+                    $('#notifBadge').addClass('hidden');
                     $('#notifBadge').html(0);
                 }
             })
