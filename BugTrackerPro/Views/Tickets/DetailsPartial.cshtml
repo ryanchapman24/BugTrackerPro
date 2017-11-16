@@ -3,6 +3,7 @@
 
 @{
     ViewBag.Title = "Details";
+    Layout = null;
 }
 
 <link rel="stylesheet" type="text/css" href="../../assets/widgets/tocify/tocify.css">
@@ -454,10 +455,6 @@
                                                     {
                                                         <i class="glyph-icon icon-user"></i>
                                                     }
-                                                    else if (hist.Property.Contains("TICKET CREATED"))
-                                                    {
-                                                        <i class="glyph-icon icon-tag"></i>
-                                                    }
                                                 </div>
                                             }
                                             else if (hist.Property.Contains("DELETED") || hist.Property.Contains("REMOVED"))
@@ -483,10 +480,6 @@
                                                     {
                                                         <i class="glyph-icon icon-user"></i>
                                                     }
-                                                    else if (hist.Property.Contains("TICKET CREATED"))
-                                                    {
-                                                        <i class="glyph-icon icon-tag"></i>
-                                                    }
                                                 </div>
                                             }
                                             else
@@ -511,10 +504,6 @@
                                                     else if (hist.Property.Contains("ASSIGNMENT"))
                                                     {
                                                         <i class="glyph-icon icon-user"></i>
-                                                    }
-                                                    else if (hist.Property.Contains("TICKET CREATED"))
-                                                    {
-                                                        <i class="glyph-icon icon-tag"></i>
                                                     }
                                                 </div>
                                             }
@@ -648,10 +637,6 @@
                                                     {
                                                         <i class="glyph-icon icon-user"></i>
                                                     }
-                                                    else if (hist.Property.Contains("TICKET CREATED"))
-                                                    {
-                                                        <i class="glyph-icon icon-tag"></i>
-                                                    }
                                                 </div>
                                             }
                                             else if (hist.Property.Contains("DELETED") || hist.Property.Contains("REMOVED"))
@@ -677,10 +662,6 @@
                                                     {
                                                         <i class="glyph-icon icon-user"></i>
                                                     }
-                                                    else if (hist.Property.Contains("TICKET CREATED"))
-                                                    {
-                                                        <i class="glyph-icon icon-tag"></i>
-                                                    }
                                                 </div>
                                             }
                                             else
@@ -705,10 +686,6 @@
                                                     else if (hist.Property.Contains("ASSIGNMENT"))
                                                     {
                                                         <i class="glyph-icon icon-user"></i>
-                                                    }
-                                                    else if (hist.Property.Contains("TICKET CREATED"))
-                                                    {
-                                                        <i class="glyph-icon icon-tag"></i>
                                                     }
                                                 </div>
                                             }
@@ -829,109 +806,105 @@
     </div>
 </div>
 
+<script type="text/javascript" src="../../assets/widgets/sticky/sticky.js"></script>
+<script type="text/javascript" src="../../assets/widgets/tocify/tocify.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+<script src="~/assets/widgets/dropzone/dropzone.js"></script>
+<script type="text/javascript">
+$(function () {
+    var toc = $("#tocify-menu").tocify({ context: ".toc-tocify", showEffect: "fadeIn", extendPage: false, selectors: "h2, h3, h4" });
+});
+jQuery(document).ready(function ($) {
 
+    /* Sticky bars */
 
-@section Scripts {
-    <script type="text/javascript" src="../../assets/widgets/sticky/sticky.js"></script>
-    <script type="text/javascript" src="../../assets/widgets/tocify/tocify.js"></script>
-    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
-    <script src="~/assets/widgets/dropzone/dropzone.js"></script>
-    <script type="text/javascript">
-        $(function () {
-            var toc = $("#tocify-menu").tocify({ context: ".toc-tocify", showEffect: "fadeIn", extendPage: false, selectors: "h2, h3, h4" });
+    $(function () {
+        "use strict";
+
+        $('.sticky-nav').hcSticky({
+            top: 90,
+            innerTop: 10,
+            stickTo: 'document'
         });
-        jQuery(document).ready(function ($) {
+    });
+});
 
-            /* Sticky bars */
+//Go to a attachment section after reloading page
+function myUploadBtn(reload) {
+    window.location.hash = "#TicketAttachments";
+    window.location.reload(true);
+};
+</script>
+<script>
+/*============================================
+ScrollTo Links
+==============================================*/
 
-            $(function () {
-                "use strict";
-
-                $('.sticky-nav').hcSticky({
-                    top: 90,
-                    innerTop: 10,
-                    stickTo: 'document'
-                });
-            });
-        });
-
-        //Go to a attachment section after reloading page
-        function myUploadBtn(reload) {
-            window.location.hash = "#TicketAttachments";
-            window.location.reload(true);
-        };
-    </script>
-    <script>
-        /*============================================
-        ScrollTo Links
-        ==============================================*/
-
-        $(function () {
-            $('#scrollToBottom').bind("click", function () {
-                $('html, body').animate({ scrollTop: $(document).height() });
-                return false;
-            });
-            $('#scrollToTop').bind("click", function () {
-                $('html, body').animate({ scrollTop: 0 });
-                return false;
-            });
-        });
-        /*============================================
-            Ajax comments
-         ==============================================*/
-        function myajaxcommentcreate(id) {
-            var msg = $('#textareaCreate').val();
-            if (msg != "") {
-                $.ajax({
-                    type: 'POST',
-                    url: '@Url.Action("AddComment", "Tickets")',
-                    data: { ticketId: id, body: msg },
-                    success: function (response) {
-                        $("#comments-container").prepend('<div class="modal fade" id="deleteComment-' + response.Id + '" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button><p class="modal-title" style="color: #e74c3c"><strong>Delete Comment</strong></p></div><div class="modal-body"><p>Are you sure you want to delete this comment?</p><br /><br /><center><p><em>"<span id="modalComment-' + response.Id + '">' + response.Body + '</span>"</em></p></center></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">No</button><button type="button" class="btn btn-primary" data-dismiss="modal" onclick="myajaxcommentdelete(' + response.Id + ')">Yes</button></div></div></div></div><li id="commentDiv-' + response.Id + '" class="float-right" style="clear: right"><div class="chat-author"><img width="36" src="../../' + response.ProfilePic + '" alt=""></div><div class="popover right no-shadow"><div class="arrow"></div><div class="popover-content"><strong style="color: #00bca4">' + response.FullName + '</strong><br /><hr /><span id="comment-' + response.Id + '">' + response.Body + '</span><div class="chat-time text-no-wrap"><i class="glyph-icon icon-clock-o"></i>' + response.Created + '</div><div class="mrg10T" style="text-align: right"><div class="btn-group dropup"><button id ="editcomment-' + response.Id + '" type="button" class="btn btn-default collapsed" data-toggle="collapse" data-target="#edit-' + response.Id + '" aria-expanded="false">Edit</button><button type="button" class="btn btn-default" data-toggle="modal" data-target="#deleteComment-' + response.Id + '"><i class="glyph-icon icon-close"></i></button></div></div><div id="edit-' + response.Id + '" class="collapse mrg20T" aria-expanded="false" style=""><textarea id="textarea-' + response.Id + '" class="form-control" name="body" rows="3" style="width: 100%" required>' + response.Body + '</textarea><div class="mrg10T" style="text-align: right"><input value="Save" class="btn btn-default" style="max-width: 60px" onclick="myajaxcommentedit(' + response.Id + ')" /></div></div></div></div></li><li id="invisDiv-' + response.Id + '" class="float-left" style="width: 100%; display: inline-block; margin-bottom: 0px"></li>');
-                        $('#textareaCreate').val('');
-                    }
-                })
+$(function () {
+    $('#scrollToBottom').bind("click", function () {
+        $('html, body').animate({ scrollTop: $(document).height() });
+        return false;
+    });
+    $('#scrollToTop').bind("click", function () {
+        $('html, body').animate({ scrollTop: 0 });
+        return false;
+    });
+});
+/*============================================
+    Ajax comments
+    ==============================================*/
+function myajaxcommentcreate(id) {
+    var msg = $('#textareaCreate').val();
+    if (msg != "") {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("AddComment", "Tickets")',
+            data: { ticketId: id, body: msg },
+            success: function (response) {
+                $("#comments-container").prepend('<div class="modal fade" id="deleteComment-' + response.Id + '" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button><p class="modal-title" style="color: #e74c3c"><strong>Delete Comment</strong></p></div><div class="modal-body"><p>Are you sure you want to delete this comment?</p><br /><br /><center><p><em>"<span id="modalComment-' + response.Id + '">' + response.Body + '</span>"</em></p></center></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">No</button><button type="button" class="btn btn-primary" data-dismiss="modal" onclick="myajaxcommentdelete(' + response.Id + ')">Yes</button></div></div></div></div><li id="commentDiv-' + response.Id + '" class="float-right" style="clear: right"><div class="chat-author"><img width="36" src="../../' + response.ProfilePic + '" alt=""></div><div class="popover right no-shadow"><div class="arrow"></div><div class="popover-content"><strong style="color: #00bca4">' + response.FullName + '</strong><br /><hr /><span id="comment-' + response.Id + '">' + response.Body + '</span><div class="chat-time text-no-wrap"><i class="glyph-icon icon-clock-o"></i>' + response.Created + '</div><div class="mrg10T" style="text-align: right"><div class="btn-group dropup"><button id ="editcomment-' + response.Id + '" type="button" class="btn btn-default collapsed" data-toggle="collapse" data-target="#edit-' + response.Id + '" aria-expanded="false">Edit</button><button type="button" class="btn btn-default" data-toggle="modal" data-target="#deleteComment-' + response.Id + '"><i class="glyph-icon icon-close"></i></button></div></div><div id="edit-' + response.Id + '" class="collapse mrg20T" aria-expanded="false" style=""><textarea id="textarea-' + response.Id + '" class="form-control" name="body" rows="3" style="width: 100%" required>' + response.Body + '</textarea><div class="mrg10T" style="text-align: right"><input value="Save" class="btn btn-default" style="max-width: 60px" onclick="myajaxcommentedit(' + response.Id + ')" /></div></div></div></div></li><li id="invisDiv-' + response.Id + '" class="float-left" style="width: 100%; display: inline-block; margin-bottom: 0px"></li>');
+                $('#textareaCreate').val('');
             }
-        }
-
-        function myajaxcommentedit(id) {
-            var msg = $('#textarea-' + id).val();
-            if (msg != '')
-            $.ajax({
-                type: 'POST',
-                url: '@Url.Action("EditComment", "Tickets")',
-                    data: { commentId: id, body: msg },
-                    success: function (response) {
-                        $('#comment-' + response.Id).html(response.Body);
-                        $('#modalComment-' + response.Id).html(response.Body);
-                        $('#editcomment-' + response.Id).click();
-                    }
-                })
-            }
-
-        function myajaxcommentdelete(id) {
-            $.ajax({
-                type: 'POST',
-                url: '@Url.Action("DeleteComment", "Tickets")',
-                data: { commentId: id },
-                success: function (response) {
-                    if ($('#commentDiv-' + response.Id).hasClass('float-right')) {
-                        $('#invisDiv-' + response.Id).remove();
-                    }
-                    $('#commentDiv-' + response.Id).remove();
-                }
-            })
-        }
-
-        function myajaxattachmentdelete(id) {
-            $.ajax({
-                type: 'POST',
-                url: '@Url.Action("DeleteAttachment", "Tickets")',
-                data: { attachmentId: id },
-                success: function (response) {
-                    $('#attachmentDiv-' + response.Id).remove();
-                }
-            })
-        }
-    </script>
+        })
+    }
 }
+
+function myajaxcommentedit(id) {
+    var msg = $('#textarea-' + id).val();
+    if (msg != '')
+    $.ajax({
+        type: 'POST',
+        url: '@Url.Action("EditComment", "Tickets")',
+            data: { commentId: id, body: msg },
+            success: function (response) {
+                $('#comment-' + response.Id).html(response.Body);
+                $('#modalComment-' + response.Id).html(response.Body);
+                $('#editcomment-' + response.Id).click();
+            }
+        })
+    }
+
+function myajaxcommentdelete(id) {
+    $.ajax({
+        type: 'POST',
+        url: '@Url.Action("DeleteComment", "Tickets")',
+        data: { commentId: id },
+        success: function (response) {
+            if ($('#commentDiv-' + response.Id).hasClass('float-right')) {
+                $('#invisDiv-' + response.Id).remove();
+            }
+            $('#commentDiv-' + response.Id).remove();
+        }
+    })
+}
+
+function myajaxattachmentdelete(id) {
+    $.ajax({
+        type: 'POST',
+        url: '@Url.Action("DeleteAttachment", "Tickets")',
+        data: { attachmentId: id },
+        success: function (response) {
+            $('#attachmentDiv-' + response.Id).remove();
+        }
+    })
+}
+</script>

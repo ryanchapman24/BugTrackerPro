@@ -219,7 +219,7 @@
     <Compile Include="Models\Helpers\FileUploadValidator.cs" />
     <Compile Include="Models\Helpers\ProjectAssignmentsHelper.cs" />
     <Compile Include="Models\Helpers\RefreshAuthenticationHelper.cs" />
-    <Compile Include="Models\Helpers\RequireUnlockedAccount.cs" />
+    <Compile Include="Models\Helpers\CustomAttributes.cs" />
     <Compile Include="Models\Helpers\UserRolesHelper.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\Helpers\ImageUploadValidator.cs" />
@@ -1267,6 +1267,8 @@
     <Content Include="Views\Tickets\AssignDeveloper.cshtml" />
     <Content Include="Views\Home\Error.cshtml" />
     <Content Include="Views\Account\Locked.cshtml" />
+    <Content Include="Views\Tickets\DetailsPartial.cshtml" />
+    <Content Include="Views\Tickets\Testosterone.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

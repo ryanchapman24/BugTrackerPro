@@ -12,8 +12,6 @@ namespace BugTrackerPro.Models.Helpers
 {
     public class RequireUnlockedAccount : AuthorizeAttribute
     {
-        //public ApplicationDbContext db = new ApplicationDbContext();
-
         protected override bool AuthorizeCore(HttpContextBase httpContext)
         {
             var isAuthorized = base.AuthorizeCore(httpContext);
@@ -50,6 +48,20 @@ namespace BugTrackerPro.Models.Helpers
                     returnUrl = filterContext.HttpContext.Request.Url.GetComponents(UriComponents.PathAndQuery, UriFormat.SafeUnescaped)
                 }));
             }
+        }
+    }
+
+    public class AjaxOnlyAttribute : ActionFilterAttribute
+    {
+        public override void OnActionExecuting(ActionExecutingContext filterContext)
+        {
+            if (!filterContext.HttpContext.Request.IsAjaxRequest())
+                filterContext.HttpContext.Response.Redirect("/Home/Error");
+        }
+
+        public override void OnActionExecuted(ActionExecutedContext filterContext)
+        {
+
         }
     }
 }

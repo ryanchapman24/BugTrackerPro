@@ -584,12 +584,9 @@
                         <div id="notifDropdown" class="dropdown-menu box-md float-right">
                             <div class="popover-title display-block clearfix pad10A">
                                 Notifications
-                                @if  (ViewBag.NotificationCount > 0)
-                                {
-                                    <a id="clearNotifs" class="text-transform-cap font-primary font-normal btn-link float-right" href="#" onclick="clearNotifs()">
-                                        Clear
-                                    </a>
-                                }
+                                <a id="clearNotifs" class="text-transform-cap font-primary font-normal btn-link float-right" href="#" onclick="clearNotifs()">
+                                    Clear
+                                </a>
                             </div>
                             <div class="scrollable-content scrollable-slim-box">
                                 <ul id="notifContainer" class="no-border notifications-box">
@@ -1190,6 +1187,7 @@
                             $('#notifDropdown').removeClass('hidden');
                             $('#notifBadge').removeClass('hidden');
                         }
+
                         $.each(response.Notifications, function (key, value) {
                             var link = "'/Home/ViewNotification/" + value.Id + "'";
                             if (value.Type == "NEW PROJECT") {

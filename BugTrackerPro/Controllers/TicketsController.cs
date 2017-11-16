@@ -56,6 +56,15 @@ namespace BugTrackerPro.Controllers
             return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
         }
 
+        // GET: Tickets/DetailsPartial/5
+        public PartialViewResult DetailsPartial(int? id)
+        {
+            var user = db.Users.Find(User.Identity.GetUserId());
+            ProjectAssignmentsHelper helper = new ProjectAssignmentsHelper();
+            Ticket ticket = db.Tickets.Find(id);
+            return PartialView(ticket);
+        }
+
         // GET: Tickets/Create
         [Authorize(Roles = "Submitter")]
         public ActionResult Create()
@@ -605,6 +614,7 @@ namespace BugTrackerPro.Controllers
 
         // GET: Tickets/Delete/5
         [HttpPost]
+        [AjaxOnly]
         public ActionResult DeleteAttachment(int attachmentId)
         {
             var user = db.Users.Find(User.Identity.GetUserId());
@@ -640,40 +650,8 @@ namespace BugTrackerPro.Controllers
             return Content(JsonConvert.SerializeObject(deletedAttachment), "application/json");
         }
 
-        // POST: Tickets/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult AddComment(string body, int ticketId)
-        //{
-        //    var user = db.Users.Find(User.Identity.GetUserId());
-        //    var oldTicket = db.Tickets.AsNoTracking().First(t => t.Id == ticketId);
-
-        //    if (body != null)
-        //    {              
-        //        TicketComment comment = new TicketComment();
-        //        comment.Created = DateTime.Now;
-        //        comment.AuthorId = User.Identity.GetUserId();
-        //        comment.TicketId = ticketId;
-        //        comment.Body = body;
-        //        db.TicketComments.Add(comment);
-        //        db.SaveChanges();
-
-        //        TicketHistory th = new TicketHistory();
-        //        th.Property = "NEW COMMENT";
-        //        th.AuthorId = user.Id;
-        //        th.TicketId = ticketId;
-        //        th.Created = DateTime.Now;
-        //        th.NewValue = comment.Body;
-        //        db.TicketHistories.Add(th);
-        //        db.SaveChanges();
-        //    }
-
-        //    return Redirect(Url.Action("Details", "Tickets", new { id = ticketId }) + "#Comments");
-        //}
-
         [HttpPost]
+        [AjaxOnly]
         public ActionResult AddComment(int ticketId, string body)
         {
             var user = db.Users.Find(User.Identity.GetUserId());
@@ -730,28 +708,8 @@ namespace BugTrackerPro.Controllers
             return Content(JsonConvert.SerializeObject(createdComment), "application/json");
         }
 
-        // POST: Tickets/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult EditComment(int commentId, string body)
-        //{
-        //    var user = db.Users.Find(User.Identity.GetUserId());
-        //    TicketComment comment = db.TicketComments.Find(commentId);
-        //    var oldTicket = db.Tickets.AsNoTracking().First(t => t.Id == comment.TicketId);
-
-        //    if (body != null)
-        //    {
-        //        comment.Body = body;
-        //        db.TicketComments.Attach(comment);
-        //        db.Entry(comment).Property("Body").IsModified = true;
-        //        db.SaveChanges();
-        //    }
-        //    return Redirect(Url.Action("Details", "Tickets", new { id = comment.TicketId }) + "#Comments");
-        //}
-
         [HttpPost]
+        [AjaxOnly]
         public ActionResult EditComment(int commentId, string body)
         {
             var user = db.Users.Find(User.Identity.GetUserId());
@@ -792,6 +750,7 @@ namespace BugTrackerPro.Controllers
         }
 
         [HttpPost]
+        [AjaxOnly]
         public ActionResult DeleteComment(int commentId)
         {
             var user = db.Users.Find(User.Identity.GetUserId());
@@ -844,6 +803,37 @@ namespace BugTrackerPro.Controllers
             db.Tickets.Remove(ticket);
             db.SaveChanges();
             return RedirectToAction("Index","Home");
+        }
+
+        // GET: Tickets/Delete/5
+        public ActionResult Testosterone(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Ticket ticket = db.Tickets.Find(id);
+            if (ticket == null)
+            {
+                return HttpNotFound();
+            }
+            return View(ticket);
+        }
+
+        // POST: Tickets/Delete/5
+        [HttpPost, ActionName("Testosterone")]
+        [ValidateAntiForgeryToken]
+        public ActionResult TestosteroneConfirmed(int id)
+        {
+            Ticket ticket = db.Tickets.Find(id);
+            var ticketNotifs = db.Notifications.Where(n => n.TicketId == ticket.Id);
+            foreach (var n in ticketNotifs)
+            {
+                db.Notifications.Remove(n);
+            }
+            db.Tickets.Remove(ticket);
+            db.SaveChanges();
+            return RedirectToAction("Index", "Home");
         }
 
         protected override void Dispose(bool disposing)

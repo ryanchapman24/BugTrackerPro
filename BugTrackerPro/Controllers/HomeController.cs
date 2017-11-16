@@ -15,8 +15,12 @@ namespace BugTrackerPro.Controllers
 {
     public class LayoutNotifs
     {
+        public LayoutNotifs()
+        {
+            Notifications = new List<Notification>();
+        }
         public int Count { get; set; }
-        public IEnumerable<Notification> Notifications { get; set; }
+        public List<Notification> Notifications { get; set; }
     }
 
     [Authorize]
@@ -84,7 +88,9 @@ namespace BugTrackerPro.Controllers
         {
             return View();
         }
+
         [HttpPost]
+        [AjaxOnly]
         public ActionResult GetNotifications(int nCount)
         {
             var user = db.Users.Find(User.Identity.GetUserId());
@@ -92,9 +98,25 @@ namespace BugTrackerPro.Controllers
             var notifs = user.Notifications.Where(n => n.Seen == false).OrderByDescending(n => n.Id);
             LayoutNotifs ln = new LayoutNotifs();
             ln.Count = notifs.Count();
-            ln.Notifications = notifs.Take(ln.Count - nCount);
+            var notifications = notifs.Take(ln.Count - nCount);
+            foreach (var n in notifications)
+            {
+                Notification note = new Notification();
+                note.Id = n.Id;
+                note.Created = n.Created;
+                note.CreatedString = n.CreatedString;
+                note.Description = n.Description;
+                note.TicketId = n.TicketId;
+                note.ProjectId = n.ProjectId;
+                note.Type = n.Type;
+                note.NotifyUserId = n.NotifyUserId;
+                note.Seen = n.Seen;
 
-            return Content(JsonConvert.SerializeObject(ln, Formatting.Indented, new JsonSerializerSettings {PreserveReferencesHandling = PreserveReferencesHandling.Objects}), "application/json");
+                ln.Notifications.Add(note);
+            }
+
+            //.each method in the ajax success worked only when serializing this way
+            return Content(JsonConvert.SerializeObject(ln), "application/json");
         }
 
         public ActionResult ViewNotification(int id)
@@ -114,6 +136,7 @@ namespace BugTrackerPro.Controllers
         }
 
         [HttpPost]
+        [AjaxOnly]
         public ActionResult ClearNotifications()
         {
             var user = db.Users.Find(User.Identity.GetUserId());

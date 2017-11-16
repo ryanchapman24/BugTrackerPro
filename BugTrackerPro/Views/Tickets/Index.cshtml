@@ -77,11 +77,40 @@
             @Html.DisplayFor(modelItem => item.Updated)
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id })<br />
+            <a href="javascript:void(0)" onclick="ticketDetailsAjaxLoad(@item.Id)">Details</a><br />
+            @*//////////////// ***** ANOTHER WAY ***** ////////////////*@
+            @*<a class="detailsPartial" href="javascript:void(0)" data-id="@item.Id">Details |</a><br />*@
+            <a href="javascript:void(0)" onclick="showDeleteModal(@item.Id)" data-target="#modalFromAnotherView" data-toggle="modal">Delete</a>
         </td>
     </tr>
 }
 
 </table>
+
+<div class="modal fade" id="modalFromAnotherView" tabindex="-1" role="dialog" aria-hidden="true" >
+    <div class="modal-dialog">
+        <div class="modal-content" id="modalFromAnotherViewTwo">
+
+        </div>
+    </div>
+</div>
+
+<div id="ticketDetails"></div>
+
+@section Scripts{
+    <script>
+        function showDeleteModal(id) {
+            $('#modalFromAnotherViewTwo').load('/Tickets/Testosterone/' + id);
+        }
+
+        function ticketDetailsAjaxLoad(id) {
+            $('#ticketDetails').load('/Tickets/DetailsPartial/' + id);
+        }
+
+        //////////////// ***** ANOTHER WAY ***** ////////////////
+        //$('.detailsPartial').click(function () {
+        //    $('#ticketDetails').load('/Tickets/DetailsPartial/' + $(this).data('id'));
+        //})
+    </script>
+}
