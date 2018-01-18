@@ -35,7 +35,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <FilesToIncludeForPublish>AllFilesInProjectFolder</FilesToIncludeForPublish>
+    <FilesToIncludeForPublish>OnlyFilesToRunTheApp</FilesToIncludeForPublish>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -1198,6 +1198,7 @@
     <None Include="Properties\PublishProfiles\chaptracker - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\chaptracker - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-3.2.1.intellisense.js" />
+    <Content Include="ProfilePics\Headshot_Square.png" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\jquery-3.2.1.js" />
@@ -1216,7 +1217,12 @@
     <Content Include="Scripts\respond.matchmedia.addListener.js" />
     <Content Include="Scripts\respond.matchmedia.addListener.min.js" />
     <Content Include="Scripts\respond.min.js" />
-    <Content Include="Web.config" />
+    <Content Include="TicketAttachments\3\Headshot_Square%281%29.png" />
+    <Content Include="TicketAttachments\3\Headshot_Square.png" />
+    <Content Include="TicketAttachments\3\RyanChapman_Evolv3_Logo.png" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -1269,11 +1275,10 @@
     <Content Include="Views\Account\Locked.cshtml" />
     <Content Include="Views\Tickets\DetailsPartial.cshtml" />
     <Content Include="Views\Tickets\Testosterone.cshtml" />
+    <Content Include="TicketAttachments\3\MVC Project Walkthrough.docx" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="ProfilePics\" />
-    <Folder Include="TicketAttachments\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -162,63 +162,66 @@
                             </tr>
                         </tfoot>*@
                         <tbody>
-                            @foreach (var item in Model.Tickets)
+                            @if (Model.Tickets != null)
                             {
-                                <tr>
-                                    <td>
-                                        <span class="bs-label label-primary"><strong>#<span style="margin-left: 3px">@item.Id</span></strong></span><br /><br />
-                                        <strong class="text-nowrap">@item.Title</strong><br />
-                                        <em class="text-no-wrap">Created by @item.OwnerUser.FullName</em><br />
-                                        <em class="text-no-wrap">@item.Created.ToString("M/dd/yyyy") at @item.Created.ToString("h:mm tt")</em>
-                                    </td>
-                                    <td>
-                                        @item.TicketType.Name
-                                    </td>
-                                    <td>
-                                        @if (item.TicketPriority.Name == "Low")
-                                        {
-                                            <br /><span class="bs-label label-blue-alt">@item.TicketPriority.Name</span><br /><br />
-                                        }
-                                        else if (item.TicketPriority.Name == "Medium")
-                                        {
-                                            <br /><span class="bs-label label-yellow" style="margin-bottom: -20px">@item.TicketPriority.Name</span><br /><br />
-                                        }
-                                        else if (item.TicketPriority.Name == "High")
-                                        {
-                                            <br /><span class="bs-label label-warning">@item.TicketPriority.Name</span><br /><br />
-                                        }
-                                        else if (item.TicketPriority.Name == "Critical")
-                                        {
-                                            <br /><span class="bs-label label-danger">@item.TicketPriority.Name</span><br /><br />
-                                        }
-                                    </td>
-                                    <td>
-                                        @item.TicketStatus.Name
-                                        @if (item.AssignToUserId != null)
-                                        {
-                                            <br /><br /><em>Assigned to: </em><strong style="color: #00bca4">@item.AssignToUser.FullName</strong>
-                                        }
-                                    </td>
-                                    <td>
-                                        @if (item.AssignToUserId != null)
-                                        {
-                                            @Html.ActionLink("Reassign", "AssignDeveloper", "Tickets", new { id = item.Id }, null)<br />
-                                        }
-                                        else
-                                        {
-                                            @Html.ActionLink("Assign", "AssignDeveloper", "Tickets", new { id = item.Id }, null)<br />
-                                        }
-                                        @if (User.IsInRole("Admin") || User.IsInRole("Project Manager") || (User.IsInRole("Developer") && item.AssignToUserId == userId))
-                                        {
-                                            @Html.ActionLink("Details", "Details", "Tickets", new { id = item.Id }, null)<br />
-                                                    @Html.ActionLink("Edit", "Edit", "Tickets", new { id = item.Id }, null)<br />
-                                        }
-                                        @if (User.IsInRole("Admin"))
-                                        {
-                                            @Html.ActionLink("Delete", "Delete", "Tickets", new { id = item.Id }, null)
-                                        }
-                                    </td>
-                                </tr>
+                                foreach (var item in Model.Tickets)
+                                {
+                                    <tr>
+                                        <td>
+                                            <span class="bs-label label-primary"><strong>#<span style="margin-left: 3px">@item.Id</span></strong></span><br /><br />
+                                            <strong class="text-nowrap">@item.Title</strong><br />
+                                            <em class="text-no-wrap">Created by @item.OwnerUser.FullName</em><br />
+                                            <em class="text-no-wrap">@item.Created.ToString("M/dd/yyyy") at @item.Created.ToString("h:mm tt")</em>
+                                        </td>
+                                        <td>
+                                            @item.TicketType.Name
+                                        </td>
+                                        <td>
+                                            @if (item.TicketPriority.Name == "Low")
+                                            {
+                                                <br /><span class="bs-label label-blue-alt">@item.TicketPriority.Name</span><br /><br />
+                                            }
+                                            else if (item.TicketPriority.Name == "Medium")
+                                            {
+                                                <br /><span class="bs-label label-yellow" style="margin-bottom: -20px">@item.TicketPriority.Name</span><br /><br />
+                                            }
+                                            else if (item.TicketPriority.Name == "High")
+                                            {
+                                                <br /><span class="bs-label label-warning">@item.TicketPriority.Name</span><br /><br />
+                                            }
+                                            else if (item.TicketPriority.Name == "Critical")
+                                            {
+                                                <br /><span class="bs-label label-danger">@item.TicketPriority.Name</span><br /><br />
+                                            }
+                                        </td>
+                                        <td>
+                                            @item.TicketStatus.Name
+                                            @if (item.AssignToUserId != null)
+                                            {
+                                                <br /><br /><em>Assigned to: </em><strong style="color: #00bca4">@item.AssignToUser.FullName</strong>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (item.AssignToUserId != null)
+                                            {
+                                                @Html.ActionLink("Reassign", "AssignDeveloper", "Tickets", new { id = item.Id }, null)<br />
+                                            }
+                                            else
+                                            {
+                                                @Html.ActionLink("Assign", "AssignDeveloper", "Tickets", new { id = item.Id }, null)<br />
+                                            }
+                                            @if (User.IsInRole("Admin") || User.IsInRole("Project Manager") || (User.IsInRole("Developer") && item.AssignToUserId == userId))
+                                            {
+                                                @Html.ActionLink("Details", "Details", "Tickets", new { id = item.Id }, null)<br />
+                                                        @Html.ActionLink("Edit", "Edit", "Tickets", new { id = item.Id }, null)<br />
+                                            }
+                                            @if (User.IsInRole("Admin"))
+                                            {
+                                                @Html.ActionLink("Delete", "Delete", "Tickets", new { id = item.Id }, null)
+                                            }
+                                        </td>
+                                    </tr>
+                                }
                             }
                         </tbody>
                     </table>

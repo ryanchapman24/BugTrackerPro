@@ -4,7 +4,7 @@
     ViewBag.Title = "Register";
 }
 
-<div class="col-md-3 center-margin">
+<div class="col-md-4 center-margin">
     @using (Html.BeginForm("Register", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post))
     {
         @Html.AntiForgeryToken()

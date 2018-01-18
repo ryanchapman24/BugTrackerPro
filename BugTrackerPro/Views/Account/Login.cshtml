@@ -9,7 +9,7 @@
         z-index: -1 !important;
     }
 </style>
-<div class="col-md-3 center-margin">
+<div class="col-md-4 center-margin">
     @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post))
     {
         @Html.AntiForgeryToken()
